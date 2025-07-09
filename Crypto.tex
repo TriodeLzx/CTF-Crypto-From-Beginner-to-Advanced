@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{book}
 \usepackage[utf8]{inputenc}
 \usepackage[UTF8]{ctex}
 \usepackage{amsmath}
@@ -9,6 +9,7 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 \lstset{
     basicstyle          =   \sffamily,          
@@ -38,7 +39,7 @@
 \numberwithin{equation}{subsubsection}
 \geometry{a4paper,left=2cm,right=2cm,top=2cm,bottom=2cm}
 \renewcommand{\thealgocf}{}
-\setcounter{tocdepth}{3}
+\setcounter{tocdepth}{2}
 \begin{document}
 \title{CTF Crypto:从入门到进阶}
 \author{Triode}
@@ -50,14 +51,14 @@
 \newpage
 \pagenumbering{arabic}
 
-\section{前言}
+\chapter{前言}
 \newpage
 
-\section{基础知识}
-\subsection{初等数论}
+\chapter{基础知识}
+\section{初等数论}
 由于现代密码学多数以数论为基础，所以在学习密码学之前，我们需要了解一些初等数论的知识，在这里对理论知识只作简要的介绍，若想深入学习初等数论相关知识，
 推荐阅读《数论概论》([美]Joseph H. Silverman著)或者《初等数论》(闵嗣鹤、严士健编).
-\subsubsection{整除与最大公约数}
+\subsection{整除与最大公约数}
 整除是数论中的基本概念，所以在学习初等数论之前，我们需要了解整除的定义.
 \paragraph{\textbf{整除的定义}}
 设$a,b$是任意两个整数(其中$b\neq 0$)，若存在一个整数$q$使得等式
@@ -120,7 +121,7 @@
 \end{equation}
 通过裴祖定理定理，我们可以知道对于任意两个不全为$0$的整数$a,b$，都存在整数$x,y$使得$ax+by=(a,b)$，这个结论在密码学中有着重要的应用.\par
 
-\subsubsection{二元一次不定方程与扩展欧几里得算法}
+\subsection{二元一次不定方程与扩展欧几里得算法}
 所谓二元一次不定方程，就是指形如$ax+by=c$的方程，其中$a,b,c$是已知的整数，$x,y$是未知的整数，在密码学中通常需要求解这类问题，
 由裴祖定理我们很容易可以知道形如$ax+by=c$的方程存在整数解的充要条件是$(a,b)|c$，而如若知道方程$ax+by=c$的一组整数解为$(x,y)=(x_0,y_0)$，
 我们很容易可以知道这组方程的所有解为可以表示为$(x,y)=(x_0-bt,y_0+at)$(其中$t\in \mathbb{Z}$).
@@ -153,7 +154,7 @@
 该函数接受两个参数$a,b$，并返回三个值$d,x,y$，其中$d$为$a$与$b$的最大公约数，$x,y$则是方程$ax+by=d$的其中一组整数解.\par
 在后面也会对拓展欧几里得算法的应用进行更加详细的介绍.\par
 
-\subsubsection{质数、同余与素性测试}
+\subsection{质数、同余与素性测试}
 质数（prime number，又称素数）是指除了$1$和它本身之外没有其他因数的大于$1$的自然数，比如$2,3,5,7,11,\cdots$都是质数，而不是质数的数称为合数.
 在密码学中，质数是一个很重要的概念.\par
 关于质数，有一个很重要的定理——算术基本定理：
@@ -224,8 +225,8 @@
 所以在一轮测试中，我们可以通过判断$a^{2^{i}d}$($i=0,1,2,\cdots $)在模$n$下是否等于$1$或$n-1$来判断$n$是否为素数，
 若对中间某一个状态$a^{2^{i}d}\equiv n-1\pmod{n}$，则可以初步判断$n$为素数，
 为提高准确率，我们需要多进行几轮测试，若$n$经过$k$轮测试都通过，则可以认为$n$为素数，否则$n$为合数.
-由此我们可以得到Miller-Rabin算法的流程：
-\begin{algorithm}
+由此我们可以得到Miller-Rabin算法的流程如下页算法所示.
+\begin{algorithm}[ht!]
     \caption{Miller-Rabin素性测试$\text{MillerRabin}(n,k)$}
     \If{$n<2$ or $n\%2=0$}{
         \Return{$n$不是素数}
@@ -255,7 +256,7 @@ Miller-Rabin算法的时间复杂度为$O(k\log{n})$，是一个很优秀的算�
 例如在pycryptodome库中有isPime函数，sympy库中有isprime函数，gmpy2库中有is\_prime函数，
 这些函数都可以帮助我们快速、准确地判断一个数是否为质数.
 
-\subsubsection{同余式与孙子定理}
+\subsection{同余式与孙子定理}
 在了解同余的概念之后，我们可以进一步了解同余式以及解法.\par
 \paragraph{\textbf{同余式}}
 对多项式$f(x)=a_nx^n+a_{n-1}x^{n-1}+\cdots+a_0$(其中$a_0,a_1,\cdots,a_n\in\mathbb{Z}$)，则对于正整数$m$
@@ -437,26 +438,26 @@ Hensel引理向我们表明了一个事实：存在一种方法可以通过同�
 我们均需要将其分子$x$，及分母$y$代入方程中进行测试，直到符合方程为止).
 
 \newpage
-\subsection{线性代数}
+\section{线性代数}
 
-\subsubsection{矩阵与行列式}
-\subsubsection{线性变换}
-\subsubsection{向量空间}
+\subsection{矩阵与行列式}
+\subsection{线性变换}
+\subsection{向量空间}
 
 \newpage
-\subsection{抽象代数}
+\section{抽象代数}
 抽象代数(又称近世代数)，是代数学的一个分支，其最根本的任务是研究各种抽象的代数结构以及其性质，其为密码学提供数学基础和工具，
 例如在AES加密算法中，我们会用到抽象代数中有限域的知识，而在椭圆曲线密码学中，则会经常用到抽象代数中群论的知识.\par
-\subsubsection{集合}
+\subsection{集合}
 
-\subsubsection{代数系统}
-\subsubsection{群}
-\subsubsection{环}
-\subsubsection{域}
-\subsubsection{格}
+\subsection{代数系统}
+\subsection{群}
+\subsection{环}
+\subsection{域}
+\subsection{格}
 
 \newpage
-\section{对称密码}
+\chapter{对称密码}
 对称密码指的是加密和解密使用相同密钥的密码算法，其加解密过程大致如下图所示：\par
 \begin{figure}[h]
     \centering
@@ -464,11 +465,11 @@ Hensel引理向我们表明了一个事实：存在一种方法可以通过同�
     \caption{对称密码加解密过程}
 \end{figure}
 在分类上，对称密码可以分为流密码（又称序列密码）和分组密码，
-\subsection{流密码}
-\subsection{分组密码}
+\section{流密码}
+\section{分组密码}
 
 \newpage
-\section{非对称密码}
+\chapter{非对称密码}
 非对称密码指的是加密和解密使用不同密钥的密码算法，其加解密过程大致如下图所示：\par
 \begin{figure}[h]
     \centering
@@ -477,7 +478,7 @@ Hensel引理向我们表明了一个事实：存在一种方法可以通过同�
 \end{figure}\par
 上图中加密密钥与解密密钥不相同，在加密密钥和解密密钥之中必有一个是公开的，另一个是保密的，一般称公开的密钥为公钥，保密的密钥为私钥，故有时候非对称密码也被称为公钥密码.\par
 在CTF比赛中常见的非对称密码有RSA、ECC(Elliptic Curve Cryptography)等，其中RSA是CTF中最常见且最基础的非对称密码算法.
-\subsection{RSA}
+\section{RSA}
 RSA算法是由Ron Rivest、Adi Shamir以及Leonard Adleman三人于1977年提出的非对称加密算法，其安全性基于大数分解的困难性，一般情况下，RSA算法的加解密步骤如下：\\
 \textbf{加密}：\par
 \begin{enumerate}
@@ -493,37 +494,68 @@ RSA算法是由Ron Rivest、Adi Shamir以及Leonard Adleman三人于1977年提�
 \end{enumerate}
 RSA算法的安全性基于大数分解的困难性，在一般情况下，我们已知公钥$(n,e)$的时候，是很难通过分解$n$得到$p,q$，从而计算出私钥$d\equiv e^{-1}\pmod{\varphi(n)}$的.\par
 实际上在CTF比赛中，出题人提供的RSA加密算法往往是有一定的缺陷的，在本节中，我们将主要介绍一些基础的对RSA算法的攻击手段.
-\subsubsection{直接分解模数$n$}
+\subsection{直接分解模数$n$}
 尽管先前提到RSA算法的安全性基于大数分解的困难性，但是在CTF比赛中，RSA加密过程中选取的素数$p,q$可能较小，或者生成的质数存在某些特殊性质，从而导致直接分解$n$变得可行，常见的分解方法有如下几种：
-\paragraph{采用工具分解}\
+\subsubsection{采用工具分解}
 
 在CTF比赛中，RSA加密过程中生成的质数可能会比较小，抑或者质因数分解结果被人为地加入了某些数据库中公开，这种情况下，我们可以直接使用一些工具来尝试分解模数$n$，常见的工具有factordb(http://www.factordb.com/)、yafu等.\par
 factordb是一个在线的质因数分解数据库，对于一个数$n$，我们可以尝试在factordb中搜索$n$，若数据库中存在该数的分解结果，则可以将其用于求解RSA，举个例子，对于$n=463901$，我们可以在factordb上搜索这个数：\\
 \begin{figure}[h]
     \centering
-    \includegraphics[width=1\textwidth]{Picture/factordb_search.png}
+    \includegraphics[width=0.8\textwidth]{Picture/factordb_search.png}
     \caption{使用factordb搜索$463901$的质因数}
 \end{figure}\\
 搜索可以得到如下结果：\\
 \begin{figure}[h]
     \centering
-    \includegraphics[width=1\textwidth]{Picture/factordb_result.png}
+    \includegraphics[width=0.6\textwidth]{Picture/factordb_result.png}
     \caption{factordb搜索结果}
 \end{figure}\\
 此时我们可以得到$463901$的质因数分解结果为$523\times 887$.但是并非所有的数都能在factordb中找到分解结果，若factordb中没有该数的分解结果，对于下面这个由两个512 bits的质数相乘得到的大整数$n$：\\
 \begin{figure}[h]
     \centering
-    \includegraphics[width=1\textwidth]{Picture/ABigNumber.png}
+    \includegraphics[width=0.8\textwidth]{Picture/ABigNumber.png}
     \caption{两个512 bits的质数相乘得到的大整数$n$}
 \end{figure}\\
 此时我们尝试使用factordb搜索该数，会得到如下结果：\\
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=1\textwidth]{Picture/factordb_factor_not_found.png}
+    \includegraphics[width=0.8\textwidth]{Picture/factordb_factor_not_found.png}
     \caption{factordb无法搜索出结果}
 \end{figure}\\
 显然，factordb无法搜索出该数的分解结果，一般在求解RSA问题的时候遇到这种情况就说明我们可能需要采用其它的方法来求解这道RSA问题了.\par
+如果想要更方便地使用factordb来分解，我们可以通过Python调用其API来实现自动化分解，有开发者利用factordb的API开发了一个名为factordb-python的库，安装方式可以参考\href{https://pypi.org/project/factordb-python/}{factordb-python}，
+举个例子，我们以LitCTF 2023中\href{https://www.nssctf.cn/problem/3893}{factordb}题目为例，题目给出如下数据：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+e = 65537
+n = 87924348264132406875276140514499937145050893665602592992418171647042491658461
+c = 87677652386897749300638591365341016390128692783949277305987828177045932576708
+\end{lstlisting}
+那么我们可以通过factordb-python库来分解模数$n$，代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+from Crypto.Util.number import *
+from factordb.factordb import FactorDB # 导入factordb-python库
 
+e = 65537
+n = 87924348264132406875276140514499937145050893665602592992418171647042491658461
+c = 87677652386897749300638591365341016390128692783949277305987828177045932576708
+
+f = FactorDB(n) # 创建factordb对象
+f.connect() # 连接到factordb
+factors = f.get_factor_list() # 获取质因数列表
+
+p = factors[0]
+q = factors[1]
+
+phi = (p - 1) * (q - 1)
+d = inverse(e, phi)
+m = pow(c, d, n)
+
+print(long_to_bytes(m))
+\end{lstlisting}
+运行代码即可得到flag.\par
+除factordb之外，我们还可以使用yafu等工具来分解模数$n$，yafu是一个开源的质因数分解工具，支持多种分解算法，下载地址\href{https://sourceforge.net/projects/yafu/}{https://sourceforge.net/projects/yafu}.\par
+这个工具需要通过命令行来使用
 \newpage
 \begin{thebibliography}{99}
     \bibitem{1} Joseph H. Silverman. 数论概论（第四版）[M]. 北京：机械工业出版社, 2020.
