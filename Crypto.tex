@@ -555,7 +555,20 @@ print(long_to_bytes(m))
 \end{lstlisting}
 运行代码即可得到flag.\par
 除factordb之外，我们还可以使用yafu等工具来分解模数$n$，yafu是一个开源的质因数分解工具，支持多种分解算法，下载地址\href{https://sourceforge.net/projects/yafu/}{https://sourceforge.net/projects/yafu}.\par
-这个工具需要通过命令行来使用
+这个工具需要通过命令行来使用，对于给定的整数$n$，我们可以在yafu目录下的命令行中输入\texttt{yafu-x64.exe factor(n)}(其中n在实际使用中换成一个具体的数)，例如对于先前的$n=463901$，我们可以在yafu目录下的命令行中输入\texttt{yafu-x64.exe factor(463901)}，得到如下图所示结果：
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.45\textwidth]{Picture/yafuFactor1.png}
+    \caption{yafu分解结果}
+\end{figure}\\
+如果要分解的数很大，则不能直接使用\texttt{factor(n)}命令，否则会出现如下图所示的错误：
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Picture/yafuFactor2.png}
+    \caption{长度过长无法直接分解}
+\end{figure}\\
+对于这种情况，我们需要先将这个数写入一个文本文件中(例如将其存入n.txt中，注意，数的末尾应有换行)，然后在命令行中使用\texttt{yafu-x64.exe "factor(@)" -batchfile n.txt}命令来分解，具体流程在此不过多赘述.
+
 \newpage
 \begin{thebibliography}{99}
     \bibitem{1} Joseph H. Silverman. 数论概论（第四版）[M]. 北京：机械工业出版社, 2020.

@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  9 JUL 2025 15:38
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  9 JUL 2025 22:34
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -744,9 +744,14 @@ File: Picture/ABigNumber.png Graphic file (type bmp)
 <Picture/ABigNumber.png>
 File: Picture/factordb_factor_not_found.png Graphic file (type bmp)
 <Picture/factordb_factor_not_found.png>
- [18] [19] [20
+ [18]
+File: Picture/yafuFactor1.png Graphic file (type bmp)
+<Picture/yafuFactor1.png>
+File: Picture/yafuFactor2.png Graphic file (type bmp)
+<Picture/yafuFactor2.png>
+ [19] [20] [21
 
-] [21] (./Crypto.aux)
+] (./Crypto.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/08/05>
@@ -755,10 +760,10 @@ Package rerunfilecheck Info: File `Crypto.out' has not changed.
 (rerunfilecheck)             Checksum: CDFD818018E17B31349EADA183763E16;2241.
  ) 
 Here is how much of TeX's memory you used:
- 19062 strings out of 474773
- 398561 string characters out of 5758618
- 2024842 words of memory out of 5000000
- 40900 multiletter control sequences out of 15000+600000
+ 19080 strings out of 474773
+ 399055 string characters out of 5758618
+ 2029842 words of memory out of 5000000
+ 40916 multiletter control sequences out of 15000+600000
  569473 words of font info for 120 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  93i,16n,97p,361b,1263s stack positions out of 10000i,1000n,20000p,200000b,200000s
