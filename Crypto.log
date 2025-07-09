@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  8 JUL 2025 16:48
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  9 JUL 2025 10:43
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -429,8 +429,7 @@ Package graphics Info: Driver file: xetex.def on input line 107.
 )
 \Gin@req@height=\dimen260
 \Gin@req@width=\dimen261
-)
-No file Crypto.aux.
+) (./Crypto.aux)
 \openout1 = `Crypto.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 42.
@@ -505,6 +504,7 @@ LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
 (Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 42.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 (Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 42.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
 *geometry* verbose mode - [ preamble ] result:
@@ -547,12 +547,11 @@ File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 LaTeX Font Info:    Trying to load font information for U+msb on input line 46.
  (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-)
-No file Crypto.toc.
+) (./Crypto.toc)
 \tf@toc=\write3
 \openout3 = `Crypto.toc'.
 
-[1
+ [1
 
 ] [1] [2] [3] (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/02/21 1.10 listings language file
@@ -587,23 +586,30 @@ Missing character: There is no ， (U+FF0C) in font [lmroman10-regular]:mapping=
 [9] [10] [11]
 File: Picture/Symmetric.png Graphic file (type bmp)
 <Picture/Symmetric.png>
- [12] [13] (./Crypto.aux)
+ [12]
+File: Picture/Asymmetric.png Graphic file (type bmp)
+<Picture/Asymmetric.png>
+File: Picture/factordb_search.png Graphic file (type bmp)
+<Picture/factordb_search.png>
+File: Picture/factordb_result.png Graphic file (type bmp)
+<Picture/factordb_result.png>
+File: Picture/ABigNumber.png Graphic file (type bmp)
+<Picture/ABigNumber.png>
+File: Picture/factordb_factor_not_found.png Graphic file (type bmp)
+<Picture/factordb_factor_not_found.png>
+ [13] [14] [15] (./Crypto.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/08/05>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 11982 strings out of 474773
- 289341 string characters out of 5758618
+ 12011 strings out of 474773
+ 289320 string characters out of 5758618
  1961842 words of memory out of 5000000
- 33940 multiletter control sequences out of 15000+600000
+ 33960 multiletter control sequences out of 15000+600000
  569065 words of font info for 113 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  93i,16n,97p,361b,1240s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on Crypto.pdf (14 pages).
+Output written on Crypto.pdf (16 pages).
