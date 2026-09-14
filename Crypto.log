@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  9 JUL 2025 22:34
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  14 SEP 2026 16:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -538,85 +538,258 @@ Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
 Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 285.
 )
 \Hy@SectionHShift=\skip81
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/tcolorbox/tcolorbox.sty
+Package: tcolorbox 2024/01/10 version 6.2.0 text color boxes
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+\pgfutil@everybye=\toks28
+\pgfutil@tempdima=\dimen266
+\pgfutil@tempdimb=\dimen267
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+\pgfutil@abb=\box68
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+))
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks29
+\pgfkeys@temptoks=\toks30
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.code.tex
+\pgfkeys@tmptoks=\toks31
+))
+\pgf@x=\dimen268
+\pgf@y=\dimen269
+\pgf@xa=\dimen270
+\pgf@ya=\dimen271
+\pgf@xb=\dimen272
+\pgf@yb=\dimen273
+\pgf@xc=\dimen274
+\pgf@yc=\dimen275
+\pgf@xd=\dimen276
+\pgf@yd=\dimen277
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count338
+\c@pgf@countb=\count339
+\c@pgf@countc=\count340
+\c@pgf@countd=\count341
+\t@pgf@toka=\toks32
+\t@pgf@tokb=\toks33
+\t@pgf@tokc=\toks34
+\pgf@sys@id@count=\count342
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-xetex.def
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-xetex.def
+File: pgfsys-xetex.def 2023-01-15 v3.1.10 (3.1.10)
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-dvipdfmx.def
+File: pgfsys-dvipdfmx.def 2023-01-15 v3.1.10 (3.1.10)
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
+)
+\pgfsys@objnum=\count343
+))) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count344
+\pgfsyssoftpath@bigbuffer@items=\count345
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+\pgfmath@dimen=\dimen278
+\pgfmath@count=\count346
+\pgfmath@box=\box69
+\pgfmath@toks=\toks35
+\pgfmath@stack@operand=\toks36
+\pgfmath@stack@operation=\toks37
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count347
+)) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/math/pgfint.code.tex) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen279
+\pgf@picmaxx=\dimen280
+\pgf@picminy=\dimen281
+\pgf@picmaxy=\dimen282
+\pgf@pathminx=\dimen283
+\pgf@pathmaxx=\dimen284
+\pgf@pathminy=\dimen285
+\pgf@pathmaxy=\dimen286
+\pgf@xx=\dimen287
+\pgf@xy=\dimen288
+\pgf@yx=\dimen289
+\pgf@yy=\dimen290
+\pgf@zx=\dimen291
+\pgf@zy=\dimen292
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen293
+\pgf@path@lasty=\dimen294
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen295
+\pgf@shorten@start@additional=\dimen296
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box70
+\pgf@hbox=\box71
+\pgf@layerbox@main=\box72
+\pgf@picture@serial@count=\count348
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen297
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.code.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen298
+\pgf@pt@y=\dimen299
+\pgf@pt@temp=\dimen300
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen301
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen302
+\pgf@sys@shading@range@num=\count349
+\pgf@shadingcount=\count350
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box73
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box74
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen303
+\pgf@nodesepend=\dimen304
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+)) (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/tools/verbatim.sty
+Package: verbatim 2023-11-06 v1.5v LaTeX2e package for verbatim enhancements
+\every@verbatim=\toks38
+\verbatim@line=\toks39
+\verbatim@in@stream=\read3
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/environ/environ.sty
+Package: environ 2014/05/04 v0.3 A new way to define environments
+ (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/trimspaces/trimspaces.sty
+Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
+))
+\tcb@titlebox=\box75
+\tcb@upperbox=\box76
+\tcb@lowerbox=\box77
+\tcb@phantombox=\box78
+\c@tcbbreakpart=\count351
+\c@tcblayer=\count352
+\c@tcolorbox@number=\count353
+\l__tcobox_tmpa_box=\box79
+\l__tcobox_tmpa_dim=\dimen305
+\tcb@temp=\box80
+\tcb@temp=\box81
+\tcb@temp=\box82
+\tcb@temp=\box83
+) (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/appendix/appendix.sty
+Package: appendix 2020/02/08 v1.2c extra appendix facilities
+\c@@pps=\count354
+\c@@ppsavesec=\count355
+\c@@ppsaveapp=\count356
 ) (./Crypto.aux)
 \openout1 = `Crypto.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 43.
-LaTeX Font Info:    ... okay on input line 43.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 61.
+LaTeX Font Info:    ... okay on input line 61.
 
 Package fontspec Info: Adjusting the maths setup (use [no-math] to avoid
 (fontspec)             this).
 
 \symlegacymaths=\mathgroup6
 LaTeX Font Info:    Overwriting symbol font `legacymaths' in version `bold'
-(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 43.
-LaTeX Font Info:    Redeclaring math accent \acute on input line 43.
-LaTeX Font Info:    Redeclaring math accent \grave on input line 43.
-LaTeX Font Info:    Redeclaring math accent \ddot on input line 43.
-LaTeX Font Info:    Redeclaring math accent \tilde on input line 43.
-LaTeX Font Info:    Redeclaring math accent \bar on input line 43.
-LaTeX Font Info:    Redeclaring math accent \breve on input line 43.
-LaTeX Font Info:    Redeclaring math accent \check on input line 43.
-LaTeX Font Info:    Redeclaring math accent \hat on input line 43.
-LaTeX Font Info:    Redeclaring math accent \dot on input line 43.
-LaTeX Font Info:    Redeclaring math accent \mathring on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Delta on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Theta on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Xi on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Pi on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Phi on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Psi on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \Omega on input line 43.
-LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 43.
-LaTeX Font Info:    Redeclaring symbol font `operators' on input line 43.
+(Font)                  OT1/cmr/m/n --> OT1/cmr/bx/n on input line 61.
+LaTeX Font Info:    Redeclaring math accent \acute on input line 61.
+LaTeX Font Info:    Redeclaring math accent \grave on input line 61.
+LaTeX Font Info:    Redeclaring math accent \ddot on input line 61.
+LaTeX Font Info:    Redeclaring math accent \tilde on input line 61.
+LaTeX Font Info:    Redeclaring math accent \bar on input line 61.
+LaTeX Font Info:    Redeclaring math accent \breve on input line 61.
+LaTeX Font Info:    Redeclaring math accent \check on input line 61.
+LaTeX Font Info:    Redeclaring math accent \hat on input line 61.
+LaTeX Font Info:    Redeclaring math accent \dot on input line 61.
+LaTeX Font Info:    Redeclaring math accent \mathring on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 61.
+LaTeX Font Info:    Redeclaring math symbol \mathdollar on input line 61.
+LaTeX Font Info:    Redeclaring symbol font `operators' on input line 61.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `normal' on input line 43.
+(Font)              `operators' in the math version `normal' on input line 61.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 43.
+(Font)                  OT1/cmr/m/n --> TU/lmr/m/n on input line 61.
 LaTeX Font Info:    Encoding `OT1' has changed to `TU' for symbol font
-(Font)              `operators' in the math version `bold' on input line 43.
+(Font)              `operators' in the math version `bold' on input line 61.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/m/n on input line 43.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/m/n on input line 61.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `normal'
-(Font)                  TU/lmr/m/n --> TU/lmr/m/n on input line 43.
+(Font)                  TU/lmr/m/n --> TU/lmr/m/n on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `normal'
-(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 43.
+(Font)                  OT1/cmr/m/it --> TU/lmr/m/it on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathbf' in version `normal'
-(Font)                  OT1/cmr/bx/n --> TU/lmr/b/n on input line 43.
+(Font)                  OT1/cmr/bx/n --> TU/lmr/b/n on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `normal'
-(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 43.
+(Font)                  OT1/cmss/m/n --> TU/lmss/m/n on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `normal'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 43.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/m/n on input line 61.
 LaTeX Font Info:    Overwriting symbol font `operators' in version `bold'
-(Font)                  TU/lmr/m/n --> TU/lmr/b/n on input line 43.
+(Font)                  TU/lmr/m/n --> TU/lmr/b/n on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathit' in version `bold'
-(Font)                  OT1/cmr/bx/it --> TU/lmr/b/it on input line 43.
+(Font)                  OT1/cmr/bx/it --> TU/lmr/b/it on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathsf' in version `bold'
-(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 43.
+(Font)                  OT1/cmss/bx/n --> TU/lmss/b/n on input line 61.
 LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
-(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 43.
+(Font)                  OT1/cmtt/m/n --> TU/lmtt/b/n on input line 61.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: xetex
@@ -652,40 +825,52 @@ LaTeX Font Info:    Overwriting math alphabet `\mathtt' in version `bold'
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-\c@lstlisting=\count338
-Package hyperref Info: Link coloring OFF on input line 43.
+\c@lstlisting=\count357
+Package hyperref Info: Link coloring OFF on input line 61.
 (./Crypto.out) (./Crypto.out)
-\@outlinefile=\write3
-\openout3 = `Crypto.out'.
+\@outlinefile=\write4
+\openout4 = `Crypto.out'.
 
-LaTeX Font Info:    Trying to load font information for U+msa on input line 48.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 66.
  (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 48.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 66.
  (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 
-] (./Crypto.toc)
-\tf@toc=\write4
-\openout4 = `Crypto.toc'.
+] (./Crypto.toc [1
 
- [1
+])
+\tf@toc=\write5
+\openout5 = `Crypto.toc'.
 
-]
+LaTeX Font Info:    Font shape `TU/SimSun(0)/m/sl' in size <10.53937> not available
+(Font)              Font shape `TU/SimSun(0)/m/it' tried instead on input line 69.
+ [2]
 Chapter 1.
 [1
 
-]
-LaTeX Font Info:    Font shape `TU/SimSun(0)/m/sl' in size <10.53937> not available
-(Font)              Font shape `TU/SimSun(0)/m/it' tried instead on input line 57.
- [2
+] [2
 
 ]
 Chapter 2.
-[3] [4] (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/listings/lstlang1.sty
+
+Underfull \hbox (badness 10000) in paragraph at lines 86--89
+
+ []
+
+
+Underfull \hbox (badness 4132) in paragraph at lines 100--102
+\TU/SimSun(0)/m/n/10.53937 在 $\OML/cmm/m/it/10.53937 a[]; a[]; [] ; a[]$ \TU/SimSun(0)/m/n/10.53937 的 所 有 公 约 数 中，|  最 大 的 一 个 称 为 $\OML/cmm/m/it/10.53937 a[]; a[]; [] ; a[]$ \TU/SimSun(0)/m/n/10.53937 的 最 大 公 约 数，|  记 作
+ []
+
+
+Underfull \vbox (badness 1968) has occurred while \output is active []
+
+ [3] [4] (d:/LaTeX/texlive/2024/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2024/02/21 1.10 listings language file
 )
 
@@ -712,16 +897,19 @@ Package fontspec Info: Font family 'FangSong(0)' created for font 'FangSong'
 (fontspec)             - 'small caps'  (m/sc) with NFSS spec.: 
 
 LaTeX Font Info:    Font shape `TU/lmtt/bx/n' in size <10.53937> not available
-(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 148.
+(Font)              Font shape `TU/lmtt/b/n' tried instead on input line 173.
  [5] [6] [7] [8] [9]
-Missing character: There is no ， (U+FF0C) in font [lmroman10-regular]:mapping=tex-text;!
-[10] [11] [12] [13] [14
+Underfull \vbox (badness 1454) has occurred while \output is active []
 
-]
+ [10]
+Missing character: There is no ， (U+FF0C) in font [lmroman10-regular]:mapping=tex-text;!
+[11] [12] [13] [14]
 Chapter 3.
 File: Picture/Symmetric.png Graphic file (type bmp)
 <Picture/Symmetric.png>
-[15] [16
+[15
+
+] [16
 
 ]
 Chapter 4.
@@ -729,11 +917,11 @@ File: Picture/Asymmetric.png Graphic file (type bmp)
 <Picture/Asymmetric.png>
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 497.
+(hyperref)                removing `math shift' on input line 555.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 497.
+(hyperref)                removing `math shift' on input line 555.
 
 [17]
 File: Picture/factordb_search.png Graphic file (type bmp)
@@ -749,23 +937,106 @@ File: Picture/yafuFactor1.png Graphic file (type bmp)
 <Picture/yafuFactor1.png>
 File: Picture/yafuFactor2.png Graphic file (type bmp)
 <Picture/yafuFactor2.png>
- [19] [20] [21
+ [19] [20] [21] [22] [23] [24] [25]
 
-] (./Crypto.aux)
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ifnextchar' on input line 947.
+
+[26] [27] [28] [29] [30] [31]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ifnextchar' on input line 1236.
+
+[32] [33] [34] [35]
+Missing character: There is no 👼 (U+1F47C) in font [lmroman10-italic]:mapping=tex-text;!
+[36]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1526.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1526.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1526.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\varphi' on input line 1526.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 1526.
+
+[37] [38] [39]
+Underfull \vbox (badness 4886) has occurred while \output is active []
+
+ [40]
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[41]
+Overfull \hbox (7.99316pt too wide) in paragraph at lines 1678--1679
+[]\TU/SimSun(0)/m/n/10.53937 在 \TU/lmr/m/n/10.53937 Sagemath \TU/SimSun(0)/m/n/10.53937 中 内 置 了 现 成 的 \TU/lmr/m/n/10.53937 LLL \TU/SimSun(0)/m/n/10.53937 算 法，|  例 如 我 们 想 要 对 格 基 $[] \OT1/cmr/m/n/10.53937 = \OMS/cmsy/m/n/10.53937 f\OT1/cmr/m/n/10.53937 (\OMS/cmsy/m/n/10.53937 ^^@\OT1/cmr/m/n/10.53937 2\OML/cmm/m/it/10.53937 ; \OT1/cmr/m/n/10.53937 2)\OML/cmm/m/it/10.53937 ; \OT1/cmr/m/n/10.53937 (\OMS/cmsy/m/n/10.53937 ^^@\OT1/cmr/m/n/10.53937 2\OML/cmm/m/it/10.53937 ; \OT1/cmr/m/n/10.53937 1)\OMS/cmsy/m/n/10.53937 g$ \TU/SimSun(0)/m/n/10.53937 计 算 $[]\OT1/cmr/m/n/10.53937 ([]\OML/cmm/m/it/10.53937 ; \OT1/cmr/m/n/10.53937 0\OML/cmm/m/it/10.53937 :\OT1/cmr/m/n/10.53937 75)$\TU/SimSun(0)/m/n/10.53937 ，|
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[42] [43] [44]
+Underfull \vbox (badness 6348) has occurred while \output is active []
+
+ [45] [46] [47] [48]
+Overfull \hbox (21.45415pt too wide) in paragraph at lines 2042--2043
+\TU/SimSun(0)/m/n/10.53937 所 以 我 们 可 以 通 过 \TU/lmr/m/n/10.53937 LLL \TU/SimSun(0)/m/n/10.53937 来 找 到 短 向 量 $[][]$，|  但 是 这 个 向 量 并 不 是 最 短 的，|  因 为 格 上 存 在 另 一 个 向 量 $\OT1/cmr/m/n/10.53937 (0\OML/cmm/m/it/10.53937 ; [] ; \OT1/cmr/m/n/10.53937 0\OML/cmm/m/it/10.53937 ; K; \OT1/cmr/m/n/10.53937 0)$\TU/SimSun(0)/m/n/10.53937 ，|
+ []
+
+[49] [50] [51] [52] [53] [54] [55] [56]
+Missing character: There is no 个 (U+4E2A) in font [lmroman7-regular]:mapping=tex-text;!
+[57]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `\@ifnextchar' on input line 2520.
+
+
+Overfull \hbox (14.50568pt too wide) in paragraph at lines 2534--2535
+[]\TU/SimSun(0)/m/n/10.53937 求 解 \TU/lmr/m/n/10.53937 ACD \TU/SimSun(0)/m/n/10.53937 主 流 的 方 法 有 三 种：| \TU/lmr/m/n/10.53937 SDA(Simultaneous Diophantine approximation approach), OL(Orthogonal
+ []
+
+[58] [59] [60] [61] [62] [63] [64]
+附录 A.
+[65
+
+
+] [66
+
+] [67] [68] (./Crypto.aux)
  ***********
 LaTeX2e <2023-11-01> patch level 1
 L3 programming layer <2022/08/05>
  ***********
-Package rerunfilecheck Info: File `Crypto.out' has not changed.
-(rerunfilecheck)             Checksum: CDFD818018E17B31349EADA183763E16;2241.
+
+
+Package rerunfilecheck Warning: File `Crypto.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `Crypto.out':
+(rerunfilecheck)             Before: 94F8407125EEFCCB39CAC1F245743C13;4629
+(rerunfilecheck)             After:  C9A286EF7CD424659260055BE8EDB173;4711.
  ) 
 Here is how much of TeX's memory you used:
- 19080 strings out of 474773
- 399055 string characters out of 5758618
- 2029842 words of memory out of 5000000
- 40916 multiletter control sequences out of 15000+600000
- 569473 words of font info for 120 fonts, out of 8000000 for 9000
+ 29211 strings out of 474773
+ 630368 string characters out of 5758618
+ 2206842 words of memory out of 5000000
+ 50850 multiletter control sequences out of 15000+600000
+ 569521 words of font info for 126 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 93i,16n,97p,361b,1263s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 93i,21n,97p,583b,1817s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on Crypto.pdf (23 pages).
+Output written on Crypto.pdf (71 pages).
