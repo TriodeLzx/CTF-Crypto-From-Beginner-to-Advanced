@@ -8,6 +8,7 @@
 \usepackage[perpage]{footmisc}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{float} 
 \usepackage{graphicx}
 \usepackage[hidelinks]{hyperref}
 \usepackage{tcolorbox}
@@ -1072,6 +1073,7 @@ print(ink)
 此时我们可以通过扩展欧几里得算法来求出$s,t$，此时可以计算：
 \begin{equation}
     c_1^s \cdot c_2^t \equiv (m^{e_1})^s \cdot (m^{e_2})^t \equiv m^{s e_1 + t e_2} \equiv m^1 \equiv m \pmod{n}
+    \nonumber
 \end{equation}
 这样就可以在不分解$n$的情况下求出明文$m$了，以SWPUCTF 2021 新生赛的\href{https://www.nssctf.cn/problem/413}{crypto2}一题为例，题目代码如下（因输出数据太长，在此不展示）：
 \begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
@@ -1529,19 +1531,78 @@ print(long_to_bytes(int(m2)))
     ed+k\varphi(n)=1
     \nonumber
 \end{equation}
-此时即便我们已知$n$的两质因数$p$和$q$也无法通过扩展欧几里得算法来求出$d$，从而无法直接使用RSA的解密公式来求出明文$m$，此时我们就需要使用AMM算法\cite{12}来求解明文$m$，
-在介绍AMM算法之前，我们需要先了解$k$次剩余的概念：
+此时即便我们已知$n$的两质因数$p$和$q$也无法通过扩展欧几里得算法来求出$d$，从而无法直接使用RSA的解密公式来求出明文$m$，那么我们就需要使用有限域开根结合中国剩余定理来求解明文$m$，具体方法如下：\par
+假定我们已知$n$的两质因数$p$和$q$，则有：
+\begin{equation}
+    c\equiv m^e\pmod{n}\Rightarrow
+    \begin{cases}
+        c&\equiv m^e\pmod{p}\\
+        c&\equiv m^e\pmod{q}
+    \end{cases}
+    \nonumber
+\end{equation}
+先考虑质数$p$，假设$g=(e,p-1)\neq 1$，那么存在整数$x, y$使得：
+\begin{equation}
+    ex+y\varphi(p)=ex+y(p-1)=g
+    \nonumber
+\end{equation}
+很显然，我们可以通过拓展欧几里得算法来求解$x$和$y$，此时有
+\begin{equation}
+    c^x\equiv m^{ex}\equiv m^{g-y(p-1)}\equiv m^g\pmod{p}
+    \nonumber
+\end{equation}
+此时我们的目的就是给计算出的$c^x\mod{p}$在一个有限域$\mathbb{Z}_p$上开$g$次方，
+我们可以使用Sagemath中的\texttt{nth\_root()}函数来进行开根，得到所有的$g$个根$\{m_1,m_2,\ldots,m_g\}$，
+同理若$g'=(e,q-1)\neq 1$，我们可以仿照上面的方法在有限域$\mathbb{Z}_q$上求出$g'$个根$\{m_1',m_2',\ldots,m_{g'}'\}$，
+此时我们就得到了$g\cdot g'$个解对$(m_i,m_j')$，利用中国剩余定理即可得到$g\cdot g'$个明文候选$m_{i,j}$满足：
+\begin{equation}
+    \begin{cases}
+        m_{i,j}\equiv m_i\pmod{p}\\
+        m_{i,j}\equiv m_j'\pmod{q}
+    \end{cases}
+    \nonumber
+\end{equation}
+以NCTF 2019的\href{https://www.nssctf.cn/problem/1288}{easyRSA}一题为例，题目代码如下（因输出数据太长，在此不展示）：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+from flag import flag
 
-\begin{concept}{$k$次剩余}
-    对于两互质整数$a,p$以及一整数$k(k\ge2)$，若存在整数$x$使得：
-    \begin{equation}
-        x^k\equiv a\pmod{p}
-        \nonumber
-    \end{equation}
-    则称$a$为模$p$的$k$次剩余，否则称$a$为模$p$的$k$次非剩余.
-\end{concept}
+e = 0x1337
+# 因数据过长，p,q具体数值省略
+p = ...
+q = ...
+n = p * q
 
-而要判断一个数$a$是否为模$p$的$k$次剩余.
+assert(flag.startswith('NCTF'))
+m = int.from_bytes(flag.encode(), 'big')
+assert(m.bit_length() > 1337)
+
+c = pow(m, e, n)
+print(c)
+\end{lstlisting}
+本题直接给出了模数$n$的两个质因数$p,q$，但是测试发现$(e, p-1)=(e, q-1)=e$，很显然需要使用上述方法，
+分别在$\mathbb{Z}_p$和$\mathbb{Z}_q$上对密文$c$开$e$次方根之后再枚举所有根的组合进行CRT获得可能的明文，最后通过判断明文的开头来确定flag，具体求解代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+from Crypto.Util.number import long_to_bytes
+from itertools import product
+
+e = 0x1337
+p = ...
+q = ...
+c = ...
+
+mps = GF(p)(c).nth_root(e, all=True)
+mqs = GF(q)(c).nth_root(e, all=True)
+
+for mp, mq in product(mps, mqs):
+    m = crt([int(mp), int(mq)], [p, q])
+    pt = long_to_bytes(m)
+    if pt.startswith(b'NCTF'):
+        print(pt)
+        break
+\end{lstlisting}
+代入题目数据运行即可获得flag.\par
+若想自己实现在有限域下开根的算法，可以参考\cite{12}所提及的AMM算法，这是一个比较经典且效率较高的算法.
 
 
 \newpage
@@ -2881,10 +2942,1310 @@ for i in range(n, 2*n):
 
 print(flag)
 \end{lstlisting}
-对于上述矩阵$\pmb{M}$我们并不能通过求矩阵$\left(\begin{matrix}\pmb{M}\\q\pmb{I}\end{matrix}\right)$的HNF来减小格的规模，故若需要加速运算可能需要使用更高效的规约算法进行规约.
+代入题目数据运行即可得到flag.\par
+需要注意的是，对于上述矩阵$\pmb{M}$我们并不能通过求矩阵$\left(\begin{matrix}\pmb{M}\\q\pmb{I}\end{matrix}\right)$的HNF来减小格的规模，故若需要加速运算可能需要使用更高效的规约算法进行规约.
 
+\subsubsection{决定LWE（Decision-LWE）}
+
+\newpage
 \subsection{NTRU}
+在了解NTRU之前，我们需要先了解三个概念——卷积多项式环、center-lift以及三元多项式（ternary polynomial）：
 
+\begin{concept}{卷积多项式环（convolution polynomial rings）}
+    对于一个整数$N$，秩为$N$的卷积多项式环即为如下商环：
+    \begin{equation}
+        R=\frac{\mathbb{Z}[x]}{(x^N-1)}
+        \nonumber
+    \end{equation}
+    类似的我们也可以定义出模$q$的卷积多项式环为如下商环：
+    \begin{equation}
+        R_q=\frac{\mathbb{Z}_q[x]}{(x^{N}-1)}
+        \nonumber
+    \end{equation}
+\end{concept}
+
+可以知道卷积多项式环中每一个多项式$a(x)$都有唯一的表示（在这之后，我们默认卷积多项式环内的多项式都是如下表示）：
+\begin{equation}
+    a(x)=a_0+a_1x+a_2x^2+\cdots+a_{N-1}x^{N-1}
+    \nonumber
+\end{equation}
+其中$a_0,a_1,\cdots,a_{N-1}\in \mathbb{Z}$（或者$\mathbb{Z}_q$，这取决于这个卷积多项式环是一般的卷积多项式环还是模$q$的卷积多项式环）
+卷积多项式环是NTRU密码体系的基础.
+
+\begin{concept}{center-lift}
+    对于$R_q$上一个多项式$a(x)$，$a(x)$到$R$上的center-lift即为一个多项式$a'(x)$满足：
+    \begin{equation}
+        a'(x)\equiv a(x)\pmod{q}
+        \nonumber
+    \end{equation}
+    其中$a'(x)$的系数$a_i'\in(-\frac{q}{2},-\frac{q}{2}]$.
+\end{concept}
+
+对于一个多项式$a(x)\in R_q$，要获得其center-lift有如下算法：
+\begin{equation}
+    a_i'=
+    \begin{cases}
+        a_i&,0\le a_i\le\frac{q}{2}\\
+        a_i-q&,\frac{q}{2}< a_i< q
+    \end{cases}
+    \nonumber
+\end{equation}
+center-lift可以通过如下代码实现：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+def center_lift(Rm, R, f):
+    modulo = ZZ(Rm(list(f)).base_ring()(-1)) + 1
+    l = [ZZ(x) if x <= modulo // 2 else ZZ(x) - modulo for x in list(f)]
+    return R(l)
+\end{lstlisting}
+
+\begin{concept}{三元多项式（ternary polynomial）}
+    对于卷积多项式环$R=\frac{\mathbb{Z}[x]}{(x^{N}-1)}$，对于任意正数$d_1,d_2$，若多项式$a(x)\in R$满足以下条件：
+    \begin{enumerate}
+        \item $a(x)$中有$d_1$个系数为$1$；
+        \item $a(x)$中有$d_2$个系数为$-1$；
+        \item $a(x)$中其余系数均为$0$
+    \end{enumerate}
+    则称这个多项式为一个三元多项式（ternary polynomial，或称trinary polynomial），对于一个卷积多项式环$R$，其上的所有三元多项式的集合记为：
+    \begin{equation}
+        \mathcal{T}(d_1,d_2)=\left\{a(x)\in R| a(x)\text{ is a ternary polynomial}\right\}
+        \nonumber
+    \end{equation}
+\end{concept}
+在了解上面三个概念之后，我们就可以进一步了解NTRU体系的算法细节了：首先取整数$N\ge1$以及两个模数$p,q$（其中$N$为质数，且$N$与$q$互质，$p$与$q$互质），得到如下三个卷积多项式环：
+\begin{equation}
+    R=\frac{\mathbb{Z}[x]}{(x^{N}-1)},\quad R_p=\frac{(\mathbb{Z}/p\mathbb{Z})[x]}{(x^{N}-1)},\quad R_q=\frac{(\mathbb{Z}/q\mathbb{Z})[x]}{(x^{N}-1)}
+    \nonumber
+\end{equation}
+在此我们将消息传递的双方分别称为Alice和Bob，Alice选取公共参数$(N,p,q,d)$（$d$也是个整数，公共参数的选择应满足$q>(6d+1)p$），
+并在$R$上随机选取三元多项式$f(x)\in\mathcal{T}(d+1,d)$以及$g(x)\in\mathcal{T}(d,d)$，计算：
+\begin{equation}
+    \begin{aligned}
+        F_p\equiv f^{-1}\pmod{p}\\
+        F_q\equiv f^{-1}\pmod{q}
+    \end{aligned}
+    \nonumber
+\end{equation}
+这样就可以得到一个$R_p$上的多项式$F_p$以及一个$R_q$上的多项式$F_q$，在此之后Alice在$R_q$上计算：
+\begin{equation}
+    h(x)=F_q(x)\star g(x)
+    \nonumber
+\end{equation}
+在这里“$\star$”表示卷积多项式环上多项式的乘法，对于两个卷积多项式环$R$上的多项式$a(x),b(x)$，其乘积定义如下：
+\begin{equation}
+    a(x)\star b(x)=c(x),\quad c_k=\sum_{i+j\equiv k\pmod{N}}{a_{i}b_{j}}
+    \nonumber
+\end{equation}
+由此计算出的多项式$h(x)$即为\textbf{公钥}，前面生成的$(f,F_p)$就是\textbf{私钥}（实际上私钥只需要$f$，Alice可以通过$f$来计算出$F_p$）.
+在此之后Bob需要通过公钥$h(x)$来加密明文$m(x)$（其中明文$m(x)\in R$，而且其中系数$m_i$满足$-\frac{p}{2}<m_i\le \frac{p}{2}$，实际上$m(x)$就是$R_p$上某个多项式的center-lift），Bob先选取一个随机三元多项式$r(x)\in\mathcal{T}(d,d)$，计算：
+\begin{equation}
+    e(x)\equiv ph(x)\star r(x)+m(x)\pmod{q}
+    \nonumber
+\end{equation}
+得到的多项式$e(x)$就是Bob的密文，Alice得到Bob发送的密文之后要进行解密，则需先在$R_q$上计算：
+\begin{equation}
+    a(x)\equiv f(x)\star e(x)\pmod{q}
+    \nonumber
+\end{equation}
+然后得到$a(x)$的center-lift，然后再在$R_p$中计算：
+\begin{equation}
+    b(x)\equiv F_p(x)\star a(x)\pmod{p}
+    \nonumber
+\end{equation}
+这样得到的$R_p$上的多项式$b(x)$就是明文$m(x)$.
+
+\subsubsection{NTRU的实现}
+在这里通过Sagemath\footnote{在本节中默认使用Sagemath 10.4}实现一个简单的例子\cite{22}：\par
+取$(N, p, q, d) = (7, 3, 41, 2)$，显然有$(6d+1)p=39<q$，而且$(p,q)=1,(N,q)=1$，符合参数选择的条件，那么可以通过如下代码构造出三个卷积多项式环：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+_R = PolynomialRing(ZZ, 'x')
+R = _R.quotient(x^N - 1, 'x')
+
+_Rp = PolynomialRing(Zmod(p), 'x')
+Rp = _Rp.quotient(x^N - 1, 'x')
+
+_Rq = PolynomialRing(Zmod(q), 'x')
+Rq = _Rq.quotient(x^N - 1, 'x')
+\end{lstlisting}
+对固定的卷积多项式环$R$，可以通过如下代码来获得随机三元多项式：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+def T(R, N, d1, d2):
+    from random import shuffle
+    coef = [1] * d1 + [-1] * d2 + [0] * (N - d1 - d2)
+    shuffle(coef)
+    return R(coef)
+\end{lstlisting}
+随机选取两个$R$上的三元多项式$f(x)\in\mathcal{T}(3,2)$以及$g(x)\in\mathcal{T}(2,2)$（并保证$f(x)$在$R_p$以及$R_q$上均可逆），选取的两个多项式如下：
+\begin{equation}
+    \begin{aligned}
+        &f(x)=x^6−x^4+x^3+x^2−1\\
+        &g(x)=x^6+x^4−x^2−x
+    \end{aligned}
+    \nonumber
+\end{equation}
+然后分别在$R_p,R_q$上计算$f(x)$的逆，对于$R_m$的模数是质数的情况，我们可以通过如下代码来求多项式$f(x)$在任意模卷积多项式环$R_m$的逆：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+def inv(Rm, f):
+    return Rm(list(f)).inverse()
+\end{lstlisting}
+但是如果环$R_m$的模数为合数的时候上述方法就不适用了，因为在合数模下，多项式的逆可能不存在或者计算复杂度很高，
+在\href{https://latticehacks.cr.yp.to/ntru.html}{https://latticehacks.cr.yp.to/ntru.html}提及了一种名为\texttt{invertmodpowerof2}的算法可以解决模数为$2^k$的情况\footnote{对于模数为一般合数的情况，目前还没有找到有效的解决方案}，经过修改可以得到如下版本：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+def invertmodpowerof2(Rm, R, f):
+    modulo = ZZ(Rm(list(f)).base_ring()(-1)) + 1
+    assert modulo.is_power_of(2)
+    _R2 = PolynomialRing(Zmod(2), 'x')
+    R2 = _R2.quotient(x^N - 1, 'x')
+
+    g = R2(list(f)).inverse()
+    while True:
+        r = center_lift(Rm, R, Rm(list(f * g)))
+        if r == 1:
+            return g
+        g = center_lift(Rm, R, Rm(list(g * (2 - r))))
+\end{lstlisting}
+回到例子，通过如下代码可以计算出$F_p$以及$F_q$：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+Fp = inv(Rp, f)
+Fq = inv(Rq, f)
+\end{lstlisting}
+可以得到：
+\begin{equation}
+    \begin{aligned}
+        &F_p=x^{6} + 2 x^{5} + x^{3} + x^{2} + x + 1\in R_p\\
+        &F_q=8 x^{6} + 26 x^{5} + 31 x^{4} + 21 x^{3} + 40 x^{2} + 2 x + 37\in R_q
+    \end{aligned}
+    \nonumber
+\end{equation}
+可以得到$(f,F_p)$作为私钥，并通过如下代码计算公钥$h(x)=F_q(x)\star g(x)$：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+h = Fq * Rq(list(g))
+\end{lstlisting}
+得到：
+\begin{equation}
+    h(x)=F_q(x)\star g(x)=20 x^{6} + 40 x^{5} + 2 x^{4} + 38 x^{3} + 8 x^{2} + 26 x + 30\in R_q
+    \nonumber
+\end{equation}
+欲加密消息$m(x)=−x^5+x^3+x^2−x+1$，取$R$上随机三元多项式$r(x)=x^6 −x^5 +x−1\in\mathcal{T}(2,2)$，
+通过\texttt{e = Rq(list(p*r*h + m))}在$R_q$上计算$e(x)\equiv pr(x)\star h(x)+m(x)\pmod{q}$，得到密文：
+\begin{equation}
+    e(x)=31 x^{6} + 19 x^{5} + 4 x^{4} + 2 x^{3} + 40 x^{2} + 3 x + 25
+    \nonumber
+\end{equation}
+综上可得参数选取以及加密全流程代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+(N, p, q, d) = (7, 3, 41, 2)
+
+_R = PolynomialRing(ZZ, 'x')
+R = _R.quotient(x^N - 1, 'x')
+
+_Rp = PolynomialRing(Zmod(p), 'x')
+Rp = _Rp.quotient(x^N - 1, 'x')
+
+_Rq = PolynomialRing(Zmod(q), 'x')
+Rq = _Rq.quotient(x^N - 1, 'x')
+
+def T(R, N, d1, d2):
+    from random import shuffle
+    coef = [1] * d1 + [-1] * d2 + [0] * (N - d1 - d2)
+    shuffle(coef)
+    return R(coef)
+
+def center_lift(Rm, R, f):
+    modulo = ZZ(Rm(list(f)).base_ring()(-1)) + 1
+    l = [ZZ(x) if x <= modulo // 2 else ZZ(x) - modulo for x in list(f)]
+    return R(l)
+
+def inv(Rm, f):
+    return Rm(f).inverse()
+
+def invertmodpowerof2(Rm, R, f):
+    modulo = ZZ(Rm(list(f)).base_ring()(-1)) + 1
+    assert modulo.is_power_of(2)
+    _R2 = PolynomialRing(Zmod(2), 'x')
+    R2 = _R2.quotient(x^N - 1, 'x')
+
+    g = R2(list(f)).inverse()
+    while True:
+        r = center_lift(Rm, R, Rm(list(f * g)))
+        if r == 1:
+            return g
+        g = center_lift(Rm, R, Rm(list(g * (2 - r))))
+
+# f = T(R, N, d + 1, d)
+f = R("x^6 - x^4 + x^3 + x^2 - 1") # private key
+# g = T(R, N, d, d)
+g = R("x^6 + x^4 - x^2 - x")
+
+Fp = inv(Rp, f)
+Fq = inv(Rq, f)
+
+h = Fq * Rq(list(g)) # public key
+
+m = R("-x^5+x^3+x^2-x+1")
+# r = T(R, N, d, d)
+r = R("x^6-x^5+x-1")
+
+e = Rq(list(p*r*h + m))
+\end{lstlisting}
+在获取密文之后，需要首先在$R_q$上计算$f(x)\star e(x)$并获取其center-lift得到$a(x)$：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+a = center_lift(Rq, R, Rq(list(f * e)))
+\end{lstlisting}
+得到：
+\begin{equation}
+    a(x)=x^{6} + 10x^{5} - 8x^{4} - x^{3} - x^{2} + x - 1
+    \nonumber
+\end{equation}
+然后在$R_p$上计算$F_p\star a(x)$并获取其center-lift得到$b(x)$：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+b = center_lift(Rp, R, Rp(list(Fp * a)))
+\end{lstlisting}
+此时可以得到：
+\begin{equation}
+    b(x)=-x^{5} + x^{3} + x^{2} - x + 1
+    \nonumber
+\end{equation}
+可以看到$b(x)=m(x)$，说明此时计算出来的就是明文，如此可以得到解密流程如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+a = center_lift(Rq, R, Rq(list(f * e)))
+b = center_lift(Rp, R, Rp(list(Fp * a)))
+\end{lstlisting}
+
+\subsubsection{针对NTRU的格攻击}
+在了解了NTRU的加解密流程以及Sagemath实现之后，我们就可以进一步了解针对NTRU的格攻击了。让我们回到公钥计算这一步，
+在这一步我们需要在$R_q$上计算$h(x)=F_q(x)\star g(x)$，两边乘上$f(x)$可以得到：
+\begin{equation}
+    f(x)\star h(x)\equiv g(x)\pmod{q}
+    \nonumber
+\end{equation}
+与对数的处理方法类似的，可以将上式变为：
+\begin{equation}
+    f(x)\star h(x)=g(x)+q\cdot u(x)
+    \nonumber
+\end{equation}
+其中$u(x)\in R$，我们想要的是私钥$f(x)$，那么可以构造出如下方程：
+\begin{equation}
+    (f(x),-u(x))
+    \left(\begin{matrix}
+        1&h(x)\\
+        0&q
+    \end{matrix}\right)=
+    (f(x),g(x))
+\end{equation}
+但是直接对多项式矩阵进行规约应该是不太可能的，那么需要找到一种方法来将多项式矩阵转换为一般的矩阵，
+先前提到对于两个卷积多项式环$R$上的多项式$a(x),b(x)$，其乘积定义为：
+\begin{equation}
+    a(x)\star b(x)=c(x),\quad c_k=\sum_{i+j\equiv k\pmod{N}}{a_{i}b_{j}}
+    \nonumber
+\end{equation}
+显然有：
+\begin{equation}
+    c_k=(a_0,a_1,\cdots,a_{N-1})\cdot(b_{k\mod{N}},b_{k-1\mod{N}},\cdots,b_{k-N+1\mod{N}})^T
+    \nonumber
+\end{equation}
+那么可以得到：
+\begin{equation}
+    (c_0,c_1,\cdots, c_{N-1})=(a_0,a_1,\cdots,a_{N-1})
+    \left(\begin{matrix}
+        b_0&b_1&\cdots&b_{N-1}\\
+        b_{N-1}&b_0&\cdots&b_{N-2}\\
+        \vdots&\vdots&&\vdots\\
+        b_{1}&b_{2}&\cdots&b_{0}
+    \end{matrix}\right)
+    \nonumber
+\end{equation}
+实际上等式右边的矩阵是$b(x)$的系数的循环排列，这样我们就可以将矩阵内的$h(x)$转换为一个$n\times n$的矩阵：
+\begin{equation}
+    H=\left(\begin{matrix}
+        h_0&h_1&\cdots&h_{N-1}\\
+        h_{N-1}&h_0&\cdots&h_{N-2}\\
+        \vdots&\vdots&&\vdots\\
+        h_{1}&h_{2}&\cdots&h_{0}
+    \end{matrix}\right)
+    \nonumber
+\end{equation}
+同理，由于$1$以及$q$也可以看作是仅有常数项不为$0$的多项式，所以可以将它们分别转换为单位矩阵$I$以及$q$倍的单位矩阵$qI$，而行向量内的多项式$f(x)$可以转换为其对应的系数向量$\pmb{f}=(f_0,f_1,\cdots,f_{N-1})$，同理$u(x),g(x)$也可以转换为对应的系数向量$\pmb{u}$以及$\pmb{g}$，那么我们就可以得到方程$(4.4.7.2.1)$的等价表示：
+\begin{equation}
+    (\pmb{f},-\pmb{u})
+    \left(\begin{matrix}
+        I&H\\
+        0&qI
+    \end{matrix}\right)=(\pmb{f},\pmb{g})
+    \nonumber
+\end{equation}
+其中$2N\times2N$矩阵$\left(\begin{matrix}I&H\\0&qI\end{matrix}\right)$所确定的格被称为NTRU格（NTRU Lattice）一般记为$\mathcal{L}_h^{\text{NTRU}}$，方便起见，后续将其记作$\mathcal{L}_h$，显然向量$(\pmb{f},\pmb{g})\in\mathcal{L}_h$，接下来分析通过对$\mathcal{L}_h$进行格基规约得到向量$(\pmb{f},\pmb{g})$的可能性：\par
+因为$\det(\mathcal{L}_h)=q^N$，所以有：
+\begin{equation}
+    \left(\frac{2}{\sqrt{4\delta-1}}\right)^{2N-1}\sqrt{2N}\cdot|\det(\mathcal{L}_h)|^{1/2N}=\left(\frac{2}{\sqrt{4\delta-1}}\right)^{2N-1}\sqrt{2Nq}
+    \nonumber
+\end{equation}
+取$\delta=\frac{3}{4}$，有：
+\begin{equation}
+    \left(\frac{2}{\sqrt{4\delta-1}}\right)^{2N-1}\sqrt{2Nq}=(\sqrt{2})^{2N-1}\cdot\sqrt{2Nq}=2^N\sqrt{Nq}
+    \nonumber
+\end{equation}
+而因为$f(x),g(x)$都是三元多项式，所以：
+\begin{equation}
+    ||(\pmb{f},\pmb{g})||=\sqrt{4d+1}\le2^N\sqrt{Nq}=\left(\frac{2}{\sqrt{4\delta-1}}\right)^{2N-1}\sqrt{2N}\cdot|\det(\mathcal{L}_h)|^{1/2N}
+    \nonumber
+\end{equation}
+很显然，$(\pmb{f},\pmb{g})$可以通过BKZ算法对格$\mathcal{L}_h$进行格基规约得到（LLL有时候不行），通过如下代码就可以构造出格并进行规约：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+L = matrix(ZZ, 2*N, 2*N)
+
+h_coeff = [ZZ(x) for x in list(h)] # 有时候可能h要乘上一个pow(q, -1, p)
+for i in range(N):
+    L[i, i] = 1
+    L[N + i, N + i] = q
+    for j in range(N):
+        L[i, N + j] = h_coeff[(j - i) % N]
+
+res = L.BKZ()
+\end{lstlisting}
+但是目标向量并不一定在第一条，所以需要遍历每一行，判断前$N$个分量表示的多项式是否属于$\mathcal{T}(d+1, d)$再尝试求解，经过测试发现，一个公钥可以通过格攻击获取多个私钥，并且这些私钥都可以成功进行解密，例如对于前面的例子，假设我们只知道公钥：
+\begin{equation}
+    h(x)=20 x^{6} + 40 x^{5} + 2 x^{4} + 38 x^{3} + 8 x^{2} + 26 x + 30
+    \nonumber
+\end{equation}
+以及密文：
+\begin{equation}
+    e(x)=31 x^{6} + 19 x^{5} + 4 x^{4} + 2 x^{3} + 40 x^{2} + 3 x + 25
+    \nonumber
+\end{equation}
+通过构造格进行私钥恢复：
+\begin{equation}
+    \mathcal{L}_h=\left(\begin{array}{rrrrrrrrrrrrrr} 1 & 0 & 0 & 0 & 0 & 0 & 0 & 30 & 26 & 8 & 38 & 2 & 40 & 20 \\ 0 & 1 & 0 & 0 & 0 & 0 & 0 & 20 & 30 & 26 & 8 & 38 & 2 & 40 \\ 0 & 0 & 1 & 0 & 0 & 0 & 0 & 40 & 20 & 30 & 26 & 8 & 38 & 2 \\ 0 & 0 & 0 & 1 & 0 & 0 & 0 & 2 & 40 & 20 & 30 & 26 & 8 & 38 \\ 0 & 0 & 0 & 0 & 1 & 0 & 0 & 38 & 2 & 40 & 20 & 30 & 26 & 8 \\ 0 & 0 & 0 & 0 & 0 & 1 & 0 & 8 & 38 & 2 & 40 & 20 & 30 & 26 \\ 0 & 0 & 0 & 0 & 0 & 0 & 1 & 26 & 8 & 38 & 2 & 40 & 20 & 30 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 & 0 & 0 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 & 0 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 & 0 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 & 0 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 & 0 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 & 0 \\ 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 41 \end{array}\right)
+    \nonumber
+\end{equation}
+代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+L = matrix(ZZ, 2*N, 2*N)
+
+h_coeff = [ZZ(x) for x in list(h)]
+for i in range(N):
+    L[i, i] = 1
+    L[N + i, N + i] = q
+    for j in range(N):
+        L[i, N + j] = h_coeff[(j - i) % N]
+
+res = L.BKZ()[1]
+ff = R([ZZ(x) for x in res[:N]])
+print(ff)
+
+fp = inv(Rp, ff)
+a = center_lift(Rq, R, Rq(list(ff * e)))
+b = center_lift(Rp, R, Rp(list(fp * a)))
+print(b)
+\end{lstlisting}
+得到多项式$f'=-x^{6} - x^{5} + x^{3} - x^{2} + 1$，显然其不等于前面的私钥$f=x^6−x^4+x^3+x^2−1$，但是计算出来的$b=-x^{5} + x^{3} + x^{2} - x + 1$却等于前面选择的明文.\par
+以SCTF 2020的\href{https://www.nssctf.cn/problem/1399}{Lattice}一题为例，题目代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+from base64 import b16encode  
+  
+Zx.<x> = ZZ[]  
+n = 109   
+q = 2048  
+p = 3  
+Df = 9  
+Dg = 10  
+Dr = 11  
+  
+def mul(f,g):  
+    return (f * g) % (x^n-1)  
+  
+def bal_mod(f,q):  
+    g = list(((f[i] + q//2) % q) - q//2 for i in range(n))  
+    return Zx(g)  
+  
+def random_poly(d):  
+    assert d <= n  
+    result = n*[0]  
+    for j in range(d):  
+        while True:  
+            r = randrange(n)  
+            if not result[r]: break  
+        result[r] = 1-2*randrange(2)  
+    return Zx(result)  
+  
+def inv_mod_prime(f,p):  
+    T = Zx.change_ring(Integers(p)).quotient(x^n-1)  
+    return Zx(lift(1 / T(f)))  
+  
+def inv_mod_powerof2(f,q):  
+    assert q.is_power_of(2)  
+    g = inv_mod_prime(f,2)  
+    while True:  
+        r = bal_mod(mul(g,f),q)  
+        if r == 1: return g  
+        g = bal_mod(mul(g,2 - r),q)  
+  
+def keygen():  
+    f = random_poly(Df)  
+    while True:  
+        try:  
+            fp = inv_mod_prime(f,p)  
+            fq = inv_mod_powerof2(f,q)  
+            break  
+        except:  
+            f = random_poly(Df)  
+    g = random_poly(Dg)  
+    h = bal_mod(p * mul(fq,g),q)  
+    pub_key = h  
+    pri_key = [f,fp]  
+    return pub_key,pri_key  
+  
+def encrypt(m,h):  
+    r = random_poly(Dr)  
+    e = bal_mod(mul(h,r) + m,q)  
+    return e  
+  
+if __name__ == '__main__':  
+    pub_key,pri_key = keygen()  
+    flag=b'SCTF{***********}'[5:-1]  
+    m = Zx(list(bin(int(b16encode(flag), 16))[2:]))  
+    print(m)  
+    e = encrypt(m,pub_key)  
+    print('pub_key=')  
+    print(pub_key)  
+    print('e=')  
+    print(e)
+\end{lstlisting}
+显然这是NTRU加密，题目代码将flag转换为二进制然后转化为一个多项式$m(x)$，给出了公钥$h(x)$以及密文$e(x)$，要恢复出明文$m(x)$，则需要先恢复出私钥，通过下面的代码就可以通过格攻击恢复出明文$m(x)$，并恢复出flag：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+from Crypto.Util.number import *
+
+N = 109
+q = 2048
+p = 3
+
+_R = PolynomialRing(ZZ, 'x')
+R = _R.quotient(x^N - 1, 'x')
+
+_Rp = PolynomialRing(Zmod(p), 'x')
+Rp = _Rp.quotient(x^N - 1, 'x')
+
+_Rq = PolynomialRing(Zmod(q), 'x')
+Rq = _Rq.quotient(x^N - 1, 'x')
+
+def center_lift(Rm, R, f):
+    modulo = ZZ(Rm(list(f)).base_ring()(-1)) + 1
+    l = [ZZ(x) if x <= modulo // 2 else ZZ(x) - modulo for x in list(f)]
+    return R(l)
+
+def inv(Rm, f):
+    return Rm(f).inverse()
+
+h = R("...")
+e = R("...")
+
+L = matrix(ZZ, 2*N, 2*N)
+
+h_coeff = [ZZ(x) for x in list(h)]
+for i in range(N):
+    L[i, i] = 1
+    L[N + i, N + i] = q
+    for j in range(N):
+        L[i, N + j] = h_coeff[(j - i) % N]
+
+res = L.BKZ(blocksize=24)
+for v in res:
+    fc = list(v[:N])
+    c0, c1, c_1 = fc.count(0), fc.count(1), fc.count(-1)
+    if c0 == 100 and c1 + c_1 == 9:
+        f = R(fc)
+        Fp = inv(Rp, f)
+        a = center_lift(Rq, R, Rq(list(f * e)))
+        b = center_lift(Rp, R, Rp(list(Fp * a)))
+        s = "".join([str(x) for x in ct])
+        pad = 8 - len(s) % 8
+        for i in range(pad + 1):
+            print(long_to_bytes(int('0' * i + s + '0' * (pad - i), 2)))
+        break
+\end{lstlisting}
+代入题目数据运行即可得到flag.
+
+\subsection{隐子集和问题（Hidden Subset Sum Problem）\cite{23}}
+
+\begin{concept}{隐子集和问题（Hidden Subset Sum Problem，HSSP）}
+    设$M$为一整数，设$\alpha_1,\alpha_2,\cdots,\alpha_n$是$\mathbb{Z}/M\mathbb{Z}$上随机选取的$n$个整数，$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n$为$\mathbb{Z}^{m}$上随机选取的$m$个$0-1$向量（即$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n\in\left\{0,1\right\}^m$），令
+    \begin{equation}
+        \pmb{h}\equiv\sum_{i=1}^{n}\alpha_i\pmb{x}_i\equiv\alpha_1\pmb{x}_1+\alpha_2\pmb{x}_2+\cdots+\alpha_n\pmb{x}_n\pmod{M}
+        \nonumber
+    \end{equation}
+    隐子集和问题（Hidden Subset Sum Problem，HSSP）即为已知整数$M$以及向量$\pmb{h}$，恢复$(\alpha_1,\alpha_2,\cdots,\alpha_n)$以及$(\pmb{x_1},\pmb{x_2},\cdots,\pmb{x_n})$.
+\end{concept}
+
+在了解如何通过格方法求解HSSP之前，我们需要了解正交格和完备格的概念：
+
+\begin{concept}{正交格（Orthogonal Lattice）与完备格（Complete Lattice）}
+    对于$\mathbb{Z}^m$上一个格$\mathcal{L}$，定义其正交格为：
+    \begin{equation}
+        \mathcal{L}^{\bot}=\left\{\pmb{v}\in\mathbb{Z}^m\mid\forall\pmb{b}\in\mathcal{L},\langle\pmb{v},\pmb{b}\rangle=0\right\}
+        \nonumber
+    \end{equation}
+    定义其完备格为$\overline{\mathcal{L}}=(\mathcal{L}^{\bot})^{\bot}$.
+\end{concept}
+
+显然的，$\mathcal{L}$为$\overline{\mathcal{L}}$的一个满秩子格.\par
+求解HSSP的一种比较行之有效的方法就是Nguyen-Stern算法，这个算法主要分为两步：
+\begin{enumerate}
+    \item 从$\pmb{h}$中得到由$\pmb{x_1},\pmb{x_2},\cdots,\pmb{x_n}$所生成的格$\mathcal{L}_{\pmb{x}}$的完备格$\overline{\mathcal{L}}_{\pmb{x}}$.
+    \item 从$\overline{\mathcal{L}}_{\pmb{x}}$中恢复向量$\pmb{x_1},\pmb{x_2},\cdots,\pmb{x_n}$，从而根据$\pmb{h},M,\pmb{x_1},\pmb{x_2},\cdots,\pmb{x_n}$恢复出$\alpha_1,\alpha_2,\cdots,\alpha_n$.
+\end{enumerate}
+
+\subsubsection*{第一步}
+首先我们需要通过正交格攻击（Orthogonal Lattice Attack）来获得$\overline{\mathcal{L}}_{\pmb{x}}$，我们设所有模$M$下与向量$\pmb{h}$正交的向量所构成的格为：
+\begin{equation}
+    \mathcal{L}_0=\left\{\pmb{u}\in\mathbb{Z}^m\mid\langle\pmb{u},\pmb{h}\rangle\equiv0\pmod{M}\right\}
+    \nonumber
+\end{equation}
+显然的，对于$\mathcal{L}_0$中任一向量$\pmb{u}$，必然有：
+\begin{equation}
+    \langle\pmb{u},\pmb{h}\rangle\equiv\left\langle\pmb{u},\sum_{i=1}^n\alpha_i\pmb{x}_i\right\rangle\equiv\sum_{i=1}^n\alpha_i\langle\pmb{u},\pmb{x}_i\rangle\equiv\alpha_1\langle\pmb{u},\pmb{x}_1\rangle+\alpha_2\langle\pmb{u},\pmb{x}_2\rangle+\cdots+\alpha_n\langle\pmb{u},\pmb{x}_n\rangle\equiv0\pmod{M}
+    \nonumber
+\end{equation}
+可以知道，向量$(\langle\pmb{u},\pmb{x}_1\rangle,\langle\pmb{u},\pmb{x}_2\rangle,\cdots,\langle\pmb{u},\pmb{x}_n\rangle)$与向量$(\alpha_1,\alpha_2,\cdots,\alpha_n)$在模$M$下是正交的，因为$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n\in\{0,1\}^m$，那么如果$\pmb{u}$足够短的话，
+向量$(\langle\pmb{u},\pmb{x}_1\rangle,\langle\pmb{u},\pmb{x}_2\rangle,\cdots,\langle\pmb{u},\pmb{x}_n\rangle)$也会比较短，而如果向量$(\langle\pmb{u},\pmb{x}_1\rangle,\langle\pmb{u},\pmb{x}_2\rangle,\cdots,\langle\pmb{u},\pmb{x}_n\rangle)$比与$(\alpha_1,\alpha_2,\cdots,\alpha_n)$在模$M$下正交的非零向量都短的话，那么它只能是零向量，也就是有：
+\begin{equation}
+    (\langle\pmb{u},\pmb{x}_1\rangle,\langle\pmb{u},\pmb{x}_2\rangle,\cdots,\langle\pmb{u},\pmb{x}_n\rangle)=(0,0,\cdots,0)\Rightarrow\langle\pmb{u},\pmb{x}_i\rangle=0(i=1,2,\cdots,n)
+    \nonumber
+\end{equation}
+那么我们可以通过一些方法构造$\mathcal{L}_0$并进行规约，取出约减基的前$m-n$个短向量$\pmb{u}_1,\pmb{u}_2,\cdots,\pmb{u}_{m-n}$可以构成$\mathcal{L}_{\pmb{x}}^{\bot}$，再求其正交格即可得到完备格$\overline{\mathcal{L}}_{\pmb{x}}=(\mathcal{L}_{\pmb{x}}^{\bot})^{\bot}$.\par
+在\cite{23}中给出了一种通过$\pmb{h}$来构造$\mathcal{L}_0$的方法，我们设$\pmb{h}=(h_1,h_2,\cdots,h_n)$，如果$\gcd(h_1,M)=1$，那么对于$\pmb{u}=(u_1,u_2,\cdots,u_m)\in\mathcal{L}_0$我们可以得到：
+\begin{equation}
+    \langle\pmb{u},\pmb{h}\rangle\equiv\sum_{i=1}^mu_ih_i\equiv u_1h_1+\sum_{i=2}^mu_ih_i\equiv0\pmod{M}
+    \nonumber
+\end{equation}
+两边同乘$h_1^{-1}$有：
+\begin{equation}
+    u_1+\sum_{i=2}^mu_ih_{1}^{-1}h_i\equiv0\pmod{M}
+    \nonumber
+\end{equation}
+即：
+\begin{equation}
+    u_1+\sum_{i=2}^m(u_ih_{1}^{-1}h_i\mod{M})=kM
+    \nonumber
+\end{equation}
+那么可以得到一线性关系：
+\begin{equation}
+    u_1=kM-\sum_{i=2}^m(u_ih_{1}^{-1}h_i\mod{M})
+    \nonumber
+\end{equation}
+通过这一线性关系我们可以构造出格：
+\begin{equation}
+    \mathcal{L}_0=\left(\begin{matrix}
+        M&0&0&\cdots&0\\
+        -h_1^{-1}h_2\mod{M}&1&0&\cdots&0\\
+        -h_1^{-1}h_3\mod{M}&0&1&\cdots&0\\
+        \vdots&\vdots&\vdots&\ddots&\vdots\\
+        -h_1^{-1}h_m\mod{M}&0&0&\cdots&1
+    \end{matrix}\right)
+    \nonumber
+\end{equation}
+根据前面的分析可以知道这个格规约后得到的约减基的前$m-n$个短向量$\pmb{u}_1,\pmb{u}_2,\cdots,\pmb{u}_{m-n}$可以构成$\mathcal{L}_{\pmb{x}}^{\bot}$，在获得$\mathcal{L}_{\pmb{x}}^{\bot}$之后，只需要求$\mathcal{L}_{\pmb{x}}^{\bot}$的核空间即可得到$\overline{\mathcal{L}}_{\pmb{x}}=(\mathcal{L}_{\pmb{x}}^{\bot})^{\bot}$.
+
+\subsubsection*{第二步}
+因为$\mathcal{L}_{\pmb{x}}$为$\overline{\mathcal{L}}_{\pmb{x}}$的一个子格，所以$\overline{\mathcal{L}}_{\pmb{x}}$中必然是包含$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n$的，又因为$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n\in\left\{0,1\right\}^m$，那么直接对$\overline{\mathcal{L}}_{\pmb{x}}$进行规约大概率是可以得到$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n$的，也可以构造格：
+\begin{equation}
+    \mathcal{L}_{\pmb{x}}'=\left(\begin{matrix}2\mathcal{L_{\pmb{x}}}\\-\pmb{e}\end{matrix}\right)
+    \nonumber
+\end{equation}
+
+来规约求得$2\pmb{x}_1-\pmb{e},2\pmb{x}_2-\pmb{e},\cdots,2\pmb{x}_n-\pmb{e}\in\left\{-1,1\right\}^m$（其中$\pmb{e}=(1,1,\cdots,1)$，要去掉规约后的格基里面全为$1$或全为$-1$的行向量，且有部分向量求出是$\pmb{e}-2\pmb{x}_i$）. 在获得$\pmb{x}_1,\pmb{x}_2,\cdots,\pmb{x}_n$之后，只需要求解方程：
+\begin{equation}
+    \pmb{h}=(\alpha_1,\alpha_2,\cdots,\alpha_n)\left(\begin{matrix}\pmb{x}_1\\\pmb{x}_2\\\vdots\\\pmb{x}_n\end{matrix}\right)
+    \nonumber
+\end{equation}
+就可以恢复出$\alpha_1,\alpha_2,\cdots,\alpha_n$.
+
+\subsubsection*{代码实现}
+根据上述分析，通过如下代码就可以求解HSSP（因为格较大，所以在正交格攻击一步中使用flatter进行加速）
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+from Crypto.Util.number import *
+
+def flatter(M): 
+    from subprocess import check_output 
+    from re import findall 
+    global count 
+    z = "[[" + "]\n[".join(" ".join(map(str, row)) for row in M) + "]]" 
+    ret = check_output(["flatter"], input=z.encode()) 
+    return matrix(M.nrows(), M.ncols(), map(int, findall(b"-?\\d+", ret))) 
+
+m = ...
+n = ...
+M = ...
+h = [...]
+
+L0 = matrix(ZZ, m, m)
+L0[0, 0] = M
+inv_h0 = inverse(h[0], M)
+for i in range(1, m):
+    L0[i, 0] = -h[i] * inv_h0
+    L0[i, i] = 1
+
+Lx_ort = matrix(ZZ, flatter(L0)[0: m-n])
+
+Lx = Lx_ort.right_kernel(algorithm='pari').matrix()
+
+e = matrix(ZZ, [1 for _ in range(m)])
+L = block_matrix(ZZ, [[2*Lx], [-e]])
+
+e = vector(ZZ, [1 for _ in range(m)])
+tmpMat = L.BKZ()
+
+B = []
+space = Lx.row_space()
+for v in tmpMat:
+    if len(set(v)) == 1:
+        continue
+    else:
+        tmp = (v + e) / 2
+
+        if tmp in space:
+            B.append(tmp)
+        elif e - tmp in space:
+            B.append(e - tmp)
+
+L_x = matrix(Zmod(M), B)
+H = vector(Zmod(M), h)
+
+print(L_x.solve_left(H))
+\end{lstlisting}
+
+
+
+\newpage
+\section{同源密码学}
+基于同源的密码学（isogeny based cryptography）是一个十分年轻的领域，它是后量子密码学的一个分支，利用椭圆曲线之间的同源映射构造密码方案。
+在这一节中，我们主要关注同源密码学中的两个密钥交换方案：超奇异同源Diffie-Hellman（Supersingular Isogeny Diffie-Hellman, SIDH）以及可交换超奇异同源Diffie-Hellman（Commutative Supersingular Isogeny Diffie-Hellman, CSIDH）。
+这两个密钥交换方案都是基于超奇异椭圆曲线（Supersingular Elliptic Curves）的同源映射构造的，具有较高的安全性和抗量子攻击能力。
+因为超奇异椭圆曲线以及同源映射相关知识在先前都没有介绍过，所以在开始介绍SIDH和CSIDH之前，我们需要先了解一些相关的基础知识。
+
+\subsection{前置知识\cite{24, 25, 26}}
+我们最先需要了解的是超奇异椭圆曲线的定义：
+
+\begin{concept}{超奇异椭圆曲线（Supersingular Elliptic Curve）}
+    对于$GF(p^r)$下的椭圆曲线$E$，若$|E|\equiv 1\pmod{p}$，则称该曲线为超奇异椭圆曲线.
+\end{concept}
+
+在同源密码学中，我们主要使用$j$-不变量（$j$-invariant）来对超奇异椭圆曲线进行分类，$j$-不变量是一个椭圆曲线的代数不变量，它可以唯一地确定一个椭圆曲线的同构类。其定义如下：
+
+\begin{concept}{$j$-不变量（$j$-invariant）}
+    对于一条由方程$y^2=x^3+ax+b$定义的椭圆曲线$E$，其$j$-不变量的定义为：
+    \begin{equation}
+        j(E)=1728\cdot\frac{4a^3}{4a^3+27b^2}
+        \nonumber
+    \end{equation}
+\end{concept}
+
+当且仅当两条定义在代数闭包$\overline{k}$上的曲线$E$与$E'$的$j$-不变量相同时这两条曲线同构，即存在点到点之间的双射$\phi$使得：
+\begin{equation}
+    \phi:E\mapsto E'
+    \nonumber
+\end{equation}
+对于二次扩展域$GF(p^2)$上的椭圆曲线，定义在$GF(p^2)$上的超奇异$j$-不变量的个数为$\lfloor p/12\rfloor+z$，这些超奇异$j$-不变量每一个都对应一条同构意义下的超奇异曲线，
+其中$z\in\{0,1,2\}$，$z$的取值取决于$p\mod 12$，即：
+\begin{equation}
+    z=\begin{cases}
+        0&,p\equiv1\pmod{12}\\
+        1&,p\equiv5\pmod{12} \text{ or } p\equiv7\pmod{12}\\
+        2&,p\equiv11\pmod{12}\\
+    \end{cases}
+    \nonumber
+\end{equation}
+例如对于$p=431$，$GF(p^2)$中的$\lfloor p/12\rfloor+2=37$个超奇异$j$-不变量分别对应一条同构意义下的超奇异椭圆曲线，这些$j$-不变量如下表所示：
+\begin{table}[!h]
+    \centering
+    \caption{$GF(431^2)$中的$37$个超奇异$j$-不变量}
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+        \hline
+        0 & 4 & 19 & 61 & 67 & 102 & 107 \\
+        \hline
+        125 & 143 & 150 & 189 & 234 & 241 & 242 \\
+        \hline
+        316 & 319 & 356 & 358 & 381 & 419 & 422 \\
+        \hline
+        $81i + 65$ & $350i + 65$ & $209i + 118$ & $222i + 118$ & $42i + 141$ & $389i + 141$ & $87i + 190$ \\
+        \hline
+        $344i + 190$ & $67i + 304$ & $364i + 304$ & $132i + 315$ & $299i + 315$ & $106i + 379$ & $325i + 379$ \\
+        \hline
+        $125i + 426$ & $306i + 426$ &&&&&\\
+        \hline
+    \end{tabular}
+\end{table}\par
+在先前提到的椭圆曲线密码学中我们主要使用Weierstrass方程（即形如$y^2 = x^3 + ax + b$的方程）所定义的曲线，这类曲线一般称为Weierstrass形式的椭圆曲线，
+而还有另外一种形式更简单的椭圆曲线是由方程$y^2=x^3+Ax^2+x$所定义的，这类椭圆曲线被称为Montgomery曲线，对于一条蒙哥马利曲线$E:y^2=x^3+Ax^2+x$，其$j$-不变量的定义为：
+\begin{equation}
+    j(E)=\frac{256(A^2-3)^3}{A^2-4}
+    \nonumber
+\end{equation}
+任何一条椭圆曲线都可以转换为$j$-不变量相同（亦即同构）的Montgomery曲线，在Sagemath中，我们可以通过\texttt{montgomery\_model}来将一条椭圆曲线转换为Montgomery曲线，例如我们要将Weierstrass形式的曲线：
+\begin{equation}
+    E:y^2=x^3+312589632x+654443578\pmod{1912812599}
+    \nonumber
+\end{equation}
+转换为对应的蒙哥马利曲线，则可以通过如下代码进行：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+p = 1912812599
+a = 312589632
+b = 654443578
+
+E = EllipticCurve(GF(p), [a, b])
+E_M = print(E.montgomery_model())
+\end{lstlisting}
+可以得到其对应的蒙哥马利曲线为：
+\begin{equation}
+    E_M:y^2 = x^3 + 723347356x^2 + x\pmod{1912812599}
+    \nonumber
+\end{equation}
+在后续的讨论中，我们主要使用Montgomery曲线来进行同源密码学的相关讨论.
+
+\subsection{同源}
+同源（Isogeny）本质上就是一条曲线到另一条曲线或者一条曲线到自身的映射，其本质为同态（Homomorphism）映射，可以简单地表达为$(x,y)\mapsto(f(x,y),g(x,y))$，其中$f,g$是两个函数。
+在先前我们讲到在后续的讨论中，我们主要使用Montgomery曲线来进行同源密码学的相关讨论，这是因为蒙哥马利曲线之间的映射可以单纯通过对$x$进行映射$x\mapsto f(x)$来表示出曲线间完整的映射，
+其完整映射形式为：
+\begin{equation}
+    (x,y)\mapsto(f(x),cyf'(x))
+    \nonumber
+\end{equation}
+其中$c$是固定常数，$f'$为$f$的导函数。例如对于一条蒙哥马利曲线$E:y^2=x^3+ax^2+x$，可以得到一个$E$到$E$的同构映射：
+\begin{equation}
+    [2]:E\mapsto E, x\mapsto\frac{(x^2-1)^2}{4x(x^2+ax+1)}
+    \nonumber
+\end{equation}
+事实上，我们令分母$4x(x^2+ax+1)=0$，可以得到三个根$0,\alpha,\frac{1}{\alpha}$（其中$\alpha$满足$\alpha^2+a\alpha+1$），我们就可以得到曲线上阶为$2$的点：$(0,0),(\alpha,0),(\frac{1}{\alpha},0)$，
+这三个点的集合就是映射$[2]$的核，记为$\ker([2])$，它是椭圆曲线群$E$的一个子群，同构于$\mathbb{Z}_2\times\mathbb{Z}_2$，这上面的点称为$2$-torsion，事实上对于任意一条椭圆曲线都有其对应的$\ker([2])$
+例如对于$GF(431^2)$下的椭圆曲线$E:y^2=x^3+x$，可以通过如下代码得到对应的上述映射:
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+p = 431
+R.<i> = GF(p^2, modulus=[1, 0, 1])
+a = 1
+E = EllipticCurve(R, [1, 0])
+print(E._multiple_x_numerator(2)) # 分式分子部分
+print(E._multiple_x_denominator(2)) # 分式分母部分
+\end{lstlisting}
+可以得到：
+\begin{equation}
+    [2]:E\mapsto E,x\mapsto\frac{x^4 + 429x^2 + 1}{4x^3 + 4x}
+    \nonumber
+\end{equation}
+我们令分母$4x^3+4x=4(x^3+x)=0$，得到三个解$0,i,-i$，据此我们就可以得到一个$E$的一个子群$\ker([2])=\{(0,0),(i,0),(-i,0),\mathcal{O}\}$，
+而且这三个点都可以确定一个二阶循环子群，我们可以通过Sagemath的\texttt{division\_points}方法对$E$的零元开二次根来达到这一目的：\texttt{E(0).division\_points(2)}，
+文献\cite{25}中给出了这样一个图来描述$E:y^2=x^3+ax^2+x$的$\ker([2])$：
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.35\textwidth]{Picture/ker2.png}
+    \caption{$E:y^2=x^3+ax^2+x$的$\ker([2])$}
+\end{figure}\\
+在这里每个“花瓣”对应一个二阶循环子群。相应的，还有三倍点映射$[3]$，对于蒙哥马利曲线$E:y^2=x^3+ax^2+x$，其对应三倍点映射为：
+\begin{equation}
+    [3]:E\mapsto E:x\mapsto\frac{x(x^4-6x^2-4ax^3-3)^2}{(3x^4+4ax^3+6x^2-1)^2}
+    \nonumber
+\end{equation}
+通过令分母等于$0$我们可以得到四个根$\beta,\delta,\zeta,\theta$，通过这四个根我们可以得到八个阶为$3$的点：$(\beta,\gamma),$ $(\beta,-\gamma),(\delta,\epsilon),(\delta,-\epsilon),(\zeta,\eta),(\zeta,-\eta),(\theta,\iota),(\theta,-\iota)$，
+这八个点加上无穷远点可以构成子群$\ker([3])\simeq\mathbb{Z}_3\times\mathbb{Z}_3$，也可以叫做$3$-torsion，$3$-torsion的结构如下图所示：
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.3\textwidth]{Picture/ker3.png}
+    \caption{$E:y^2=x^3+ax^2+x$的$\ker([3])$}
+\end{figure}\\
+这里每个“花瓣”对应一个三阶循环子群。推广到一般情况，所有阶为$l$的点（$p\nmid l$）与$\mathcal{O}$构成的子群就是$\ker([l])\simeq \mathbb{Z}_l\times\mathbb{Z}_l$（或者称为$l$-torsion），而若$l$为质数，则可以得到$l+1$个$l$阶循环子群。\par
+在了解上面的概念之后，我们就可以给出可分同源的定义了：
+
+\begin{concept}{可分同源（Separable Isogeny）}
+    对于一条椭圆曲线$E$上的椭圆曲线群以及它的一个子群$G$，可以构造出唯一的同源$\phi:E\mapsto E'$，使得$\ker(\phi)=G$且有$deg(\phi)=|G|$，这样的同源称为可分同源（separable isogeny），
+    这样得到的曲线$E'$称为该同源的陪域（codomain），可以表示为$E/G$.
+\end{concept}
+
+我们可以使用Vélu公式来计算可分同源的陪域以及同源映射，Vélu公式可以接受一个椭圆曲线$E$以及它的一个有限子群$G$作为输入，输出该同源的陪域$E/G$以及同源映射$\phi:E\mapsto E/G$.\par
+以Montgomery曲线$E:y^2=x^3+ax^2+x$为例，设其上一个二阶子群为$G=\{\mathcal{O},(\alpha,0)\}$，我们可以以$G,E$作为输入，得到映射：
+\begin{equation}
+    \phi:x\mapsto\frac{x(\alpha x-1)}{x-\alpha}
+    \nonumber
+\end{equation}
+以及陪域$E':y^2=x^3+2(1-2\alpha^2)x^2+x$，这个映射被用于计算Montgomery曲线的2-同源\footnote{对于一个可分同源$\phi$，设其度$deg(\phi)=d$，则称这个同源为$d$-同源（$d$-isogeny）}，对$GF(431^2)$下的超奇异椭圆曲线$E:y^2=x^3+(208i+161)x^2+x$，
+我们知道$j(E)=364i+304$，我们可以通过如下Sagemath代码求得其一个$2$-同源并确保其输出的陪域为Montgomery曲线：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+p = 431
+R.<i> = GF(p^2, modulus=[1, 0, 1])
+E = EllipticCurve(R, [0, 208*i+161, 0, 1, 0])
+
+ker2 = E(0).division_points(2)
+# [(0 : 1 : 0), (0 : 0 : 1), (350*i + 68 : 0 : 1), (304*i + 202 : 0 : 1)]
+
+alpha = ker2[2]
+phi = E.isogeny(alpha, model = "montgomery")
+print(phi.rational_maps())
+print()
+E_ = phi.codomain()
+print(E_)
+print(E_.j_invariant())
+\end{lstlisting}
+可以得到映射$\phi$：
+\begin{equation}
+    \phi:x\mapsto\frac{(-81i + 68)x^2 - x}{x + (81i - 68)}
+    \nonumber
+\end{equation}
+以及陪域$E':y^2 = x^3 + (102i+423)x^2 + x$，其$j$-不变量$j(E')=344i+190$，由此我们也可以知道同源会使得$j$-不变量发生变化.
+\subsubsection*{Sagemath上的同源}
+我们一般用Sagemath的\texttt{isogeny}方法来计算同源，其函数原型如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+isogeny(
+    _kernel_, 
+    _codomain=None_, 
+    _degree=None_, 
+    _model=None_, 
+    _check=True_, 
+    _algorithm=None_, 
+    _velu_sqrt_bound=None_
+)
+\end{lstlisting}
+其中重要的参数如下：
+\begin{itemize}
+    \item \texttt{\_kernel\_}：就是前面提到输入的$G$，可以是一个点，可以是点列，也可以是本原核多项式
+    \item \texttt{codomain}：陪域，输入为一条椭圆曲线，这样生成的同源的陪域就是这条椭圆曲线
+    \item \texttt{model}：输出的陪域的形式，有三种可选参数：
+    \begin{itemize}
+        \item \texttt{minimal}：输出全局最小的椭圆曲线
+        \item \texttt{short\_weierstrass}：输出short Weierstrass曲线，即由$y^2=x^3+ax+b$形式的方程所定义的椭圆曲线
+        \item \texttt{montgomery}：输出Montgomery曲线，即由$y^2=x^3+ax^2+x$形式的方程所定义的椭圆曲线
+    \end{itemize}
+    \item \texttt{algorithm}：算法，有三种可选参数：
+    \begin{itemize}
+        \item \texttt{velusqrt}：使用文献\cite{27}中提出的平方根Vélu算法进行计算
+        \item \texttt{factored}：将计算度为较大合数的同源分解为计算度为较小质数的同源的组合
+        \item \texttt{traditional}：传统算法
+    \end{itemize}
+\end{itemize}
+
+\subsubsection*{同源图（Isogeny Graph）}
+对于一个固定的$p$，我们用$GF(p^2)$中所有的超奇异$j$-不变量各构造一条曲线，在每条曲线的$\ker([l])$中取除了无穷远点外的所有点分别进行同源，将原来曲线的$j$-不变量作为起点，
+同源得到的陪域的$j$-不变量作为终点，就可以得到一个无向图，称为同源图，例如在文献\cite{25}中给出的$GF(431^2)$下的$\ker([2])$的同源图：
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Picture/isoGker2.png}
+    \caption{$GF(431^2)$下的$\ker([2])$的同源图}
+\end{figure}\\
+通过同源图，我们可以知道超奇异曲线的$j$-不变量在同源时的变化路线。在Sagemath中，我们可以通过如下算法来绘制$GF(p^2)$下的$\ker([l])$的同源图：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+def IsogenyGraph(p, l=2, vertex_size=3750, size=[20, 20]):
+    R.<i> = GF(p^2, modulus=[1,0,1])
+
+    jlist = {}
+    Elist = []
+
+    E = EllipticCurve(R, [1, 0])
+    assert E.is_supersingular()
+    jlist[E.j_invariant()] = set()
+    Elist.append(E)
+
+    while Elist:
+        tmp = Elist.pop()
+        kerl = tmp(0).division_points(l)
+        for P in kerl:
+            if P != tmp(0):
+                phi = tmp.isogeny(P, model = "montgomery")
+                E2 = phi.codomain()
+                j = E2.j_invariant()
+                # print(tmp.j_invariant(), j)
+                if j not in jlist:
+                    jlist[j] = set()
+                if j not in jlist[tmp.j_invariant()]:
+                    jlist[tmp.j_invariant()].add(j)
+                    Elist.append(E2)
+
+    Tab = {}
+    for x in jlist:
+        Tab[x] = list(jlist[x])
+    G = Graph(Tab)
+
+    G.set_pos(G.layout_circular())
+    G.plot(vertex_labels=True,vertex_size=vertex_size).show(figsize=size)
+\end{lstlisting}
+通过这个算法我们可以计算出$GF(p^2)$下的$\ker([l])$的同源图.
+
+\subsection{超奇异同源Diffie-Hellman密钥交换体系（SIDH）}
+了解同源的基本概念之后，我们就可以介绍超奇异同源Diffie-Hellman密钥交换体系（Supersingular Isogeny Diffie-Hellman, SIDH）了。
+\subsubsection{SIDH协议细节}
+SIDH的步骤与一般的Diffie-Hellman密钥交换协议类似，主要分为四个部分：参数生成、Alice侧的密钥生成、Bob侧的密钥生成以及密钥交换。
+\subsubsection*{参数生成}
+首先密钥交换双方（以下称为Alice和Bob）协商选取模数$p=2^a3^b-1$，其中$2^a\approx 3^b$，然后选取一条$GF(p^2)$下的超奇异椭圆曲线$E$，
+在此之后，Alice选取$E$上阶为$2^a$的两点$P_A,Q_A$并公开，Bob选取$E$上阶为$3^b$的两点$P_B,Q_B$并公开（在选取的时候，需要保证$P_A,Q_A$线性无关，$P_B,Q_B$线性无关）。\par
+\subsubsection*{Alice侧的密钥生成}
+Alice随机选取秘密值$k_A\in\{0,1,\cdots,2^a-1\}$，计算$S_A=P_A+k_AQ_A$，并通过$S_A$计算同源$\phi_A:E\mapsto E_A$，其中$E_A=E/\langle S_A\rangle$，$\phi_A$由$a$个$2$-同源组合而成，最后使用$(E_A,\phi_A(P_B),\phi_A(Q_B))$作为公钥，$(k_A,S_A)$作为私钥；
+\subsubsection*{Bob侧的密钥生成}
+Bob随机选取秘密值$k_B\in\{0,1,\cdots,3^b-1\}$，计算$S_B=P_B+k_BQ_B$，通过$S_B$计算同源$\phi_B:E\mapsto E_B$，其中$\phi_B$由$b$个$3$-同源组合而成，使用$(E_B,\phi_B(P_A),\phi_B(Q_A))$作为公钥，$(k_B,S_B)$作为私钥。
+\subsubsection*{密钥交换}
+通过上述计算得到的公钥，Alice可以计算出$S_{A}'=\phi_B(P_A)+k_A\phi_B(Q_A)$，计算同源$\phi_A':E_B\mapsto E_{AB}$，就可以计算出$j_{AB}=j(E_{AB})$，同样的，Bob可以计算出$S_{B}'=\phi_A(P_B)+k_B\phi_A(Q_B)$，然后计算同源$\phi_B':E_A\mapsto E_{BA}$，
+从而可以计算出$j_{BA}=j(E_{BA})$，有$j_{AB}=j_{BA}$，所以共享密钥值为$j=j_{AB}=j_{BA}$.
+
+\subsubsection{SIDH实例\cite{25}}
+在这里举一个简单的例子来说明SIDH的具体计算过程：\par
+Alice和Bob协商选取模数$p=2^43^3-1=431$，并选取$GF(p^2)$上的一条超奇异椭圆曲线：
+\begin{equation}
+    E:y^2=x^3+(329i+423)x^2+x
+    \nonumber
+\end{equation}
+有$j(E)=87i+190$，Alice从中选取两个阶为$2^4$的点：
+\begin{equation}
+    P_A=(100i+248,304i+199),Q_A=(426i+394,51i+79)
+    \nonumber
+\end{equation}
+同时Bob从中选取两个阶为$3^3$的点：
+\begin{equation}
+    P_B = (358i+275, 410i+104),Q_B = (20i+185, 281i+239)
+    \nonumber
+\end{equation}
+对应Sagemath代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+p = 2^4 * 3^3 - 1
+R.<i> = GF(p^2, modulus=[1, 0, 1])
+a = 329*i + 423
+
+E = EllipticCurve(R, [0, a, 0, 1, 0])
+
+PA = E(100*i+248, 304*i+199)
+QA = E(426*i+394, 51*i+79)
+assert PA.order() == QA.order() == 2^4
+
+PB = E(358*i+275, 410*i+104)
+QB = E(20*i+185, 281*i+239)
+assert PB.order() == QB.order() == 3^3
+\end{lstlisting}
+然后Alice从$\{0,1,\cdots,2^4-1\}$中选择$k_A=11$，据此计算$S_A=P_A+k_AQ_A=(271i + 79, 153i + 430)$，我们可以通过如下算法计算同源路径从而得到$S_A$对应的同源：
+\begin{algorithm}[h!]
+    \caption{同源路径算法（Alice侧）}
+    \KwIn{椭圆曲线$E$，点$S_A,P_B,Q_B$}
+    \KwOut{同源$\phi_A$，公钥$(E',P',Q')$}
+    $S',P',Q',E'\leftarrow S_A,P_B,Q_B,E$\\
+    $\phi_A\leftarrow e$
+    \For{$i=a-1$ \KwTo $0$}{
+        $R\leftarrow2^iS'$\\
+        $\phi'\leftarrow \text{Isogeny}(E', R)$\\
+        $S',E',P',Q'\leftarrow \phi'(S'),\phi'(E'),\phi'(P'),\phi'(Q')$\\
+        $\phi_A\leftarrow \phi'\circ\phi_A$\\
+    }
+    \Return{$\phi_A,(E',P',Q')$} 
+\end{algorithm}\\
+其中$e$表示恒等映射，对应Sagemath代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+phis = []
+
+SA_, EA_, PB_, QB_ = SA, E, PB, QB
+
+for e in range(a-1, -1, -1):
+    RA_ = SA_ * 2^e
+    phi = EA_.isogeny(-RA_, model="montgomery")
+    phis.append(phi)
+    SA_, EA_, PB_, QB_ = phi(SA_), phi.codomain(), phi(PB_), phi(QB_)
+
+phiA = phis[-1]
+for i in range(len(phis) - 2, -1, -1):
+    phiA = phiA * phis[i]
+\end{lstlisting}
+计算得到$E_A:y^2 = x^3 + (128i+19)x^2 + x$，$\phi_A(P_B)=(130i + 170,428i + 290)$，$\phi_A(Q_B)=(235i+209,126i+15)$.\par
+同理，Bob在$\{0,1,\cdots,3^3-1\}$中选择$k_B=2$，计算$S_B=P_B+k_BQ_B=(122i +309, 291i+374)$，那么我们可以通过如下算法计算出$S_B$对应的同源：\\
+\begin{algorithm}[H]
+    \caption{同源路径算法（Bob侧）}
+    \KwIn{椭圆曲线$E$，点$S_B,P_A,Q_A$}
+    \KwOut{同源$\phi_B$，公钥$(E',P',Q')$}
+    $S',P',Q',E'\leftarrow S_B,P_A,Q_A,E$\\
+    $\phi_B\leftarrow e$
+    \For{$i=b-1$ \KwTo $0$}{
+        $R\leftarrow3^iS'$\\
+        $\phi'\leftarrow \text{Isogeny}(E', R)$\\
+        $S',E',P',Q'\leftarrow \phi'(S'),\phi'(E'),\phi'(P'),\phi'(Q')$\\
+        $\phi_B\leftarrow \phi'\circ\phi_B$\\
+    }
+    \Return{$\phi_B,(E',P',Q')$} 
+\end{algorithm}
+\noindent
+其中$e$表示恒等映射，对应Sagemath代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+phis = []
+SB_, EB_, PA_, QA_ = SB, E, PA, QA
+
+for e in range(b-1, -1, -1):
+    RB_ = SB_ * 3^e
+    phi = EB_.isogeny(RB_, model="montgomery")
+    phis.append(phi)
+    SB_, EB_, PA_, QA_ = phi(SB_), phi.codomain(), phi(PA_), phi(QA_)
+
+phiB = phis[-1]
+for i in range(len(phis) - 2, -1, -1):
+    phiB = phiB * phis[i]
+\end{lstlisting}
+计算得到$E_B:y^2 = x^3 + (329i+8)x^2 + x$，$\phi_B(P_A)=(160i + 421, 246i + 252)$，$\phi_B(Q_A)=(119i+14, 246i + 138)$.\par
+这样双方的公钥均已经计算出来，最后Alice就可以通过自己的私钥计算出：
+\begin{equation}
+    S_{A}'=\phi_B(P_A)+k_A\phi_B(Q_A)    
+    \nonumber
+\end{equation}
+再通过上述算法计算出Alice侧$S_{A}'$对应的同源的陪域$E_A/\langle S_{A}'\rangle$，那么这个陪域的$j$-不变量就是共享密钥，同样的，Bob可以通过自己的私钥计算出：
+\begin{equation}
+    S_{B}'=\phi_A(P_B)+k_B\phi_A(Q_A)
+    \nonumber
+\end{equation}
+再通过上述算法计算出Bob侧$S_{B}'$对应的同源的陪域$E_B/\langle S_{B}'\rangle$，那么这个陪域的$j$-不变量就是共享密钥，可以通过下列代码计算出共享密钥：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+SAB = phiA(PB) + kB * phiA(QB)
+EAB = EA_.isogeny(SAB, model="montgomery").codomain()
+Bob_shared_secret = EAB.j_invariant()
+
+print(Bob_shared_secret)
+SBA = phiB(PA) + kA * phiB(QA)
+EBA = EB_.isogeny(SBA, model="montgomery").codomain()
+Alice_shared_secret = EBA.j_invariant()
+
+print(Alice_shared_secret)
+\end{lstlisting}
+可以计算出共享密钥为$234$，整理并优化代码后可以得到SIDH的完整实现代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+a = 4
+b = 3
+p = 2^a * 3^b - 1
+R.<i> = GF(p^2, modulus=[1, 0, 1])
+A = 329*i + 423
+
+E = EllipticCurve(R, [0, A, 0, 1, 0])
+
+PA = E(100*i+248, 304*i+199)
+QA = E(426*i+394, 51*i+79)
+
+PB = E(358*i+275, 410*i+104)
+QB = E(20*i+185, 281*i+239)
+assert PA.order() == QA.order() == 2^4 and PB.order() == QB.order() == 3^3
+
+kA = 11
+SA = PA + kA * QA
+phiA = E.isogeny(SA, model="montgomery", algorithm="factored")
+EA = phiA.codomain()
+PB_ = phiA(PB)
+QB_ = phiA(QB)
+
+kB = 2
+SB = PB + kB * QB
+phiB = E.isogeny(SB, model="montgomery", algorithm="factored")
+EB = phiB.codomain()
+PA_ = phiB(PA)
+QA_ = phiB(QA)
+
+SAB = phiA(PB) + kB * phiA(QB)
+EAB = EA.isogeny(SAB, model="montgomery", algorithm="factored").codomain()
+Bob_shared_secret = EAB.j_invariant()
+
+SBA = phiB(PA) + kA * phiB(QA)
+EBA = EB.isogeny(SBA, model="montgomery", algorithm="factored").codomain()
+Alice_shared_secret = EBA.j_invariant()
+
+assert Bob_shared_secret == Alice_shared_secret
+print(Alice_shared_secret)
+\end{lstlisting}
+或者可以将封装公钥和计算私钥封装为函数：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+def gen_public_key(E, P1, Q1, s, P2, Q2):
+    S = P1 + s*Q1
+    phi = E.isogeny(S, model='montgomery', algorithm="factored")
+    return phi, (phi.codomain(), phi(P2), phi(Q2))
+
+def gen_shared_secret(E, P, Q, s):
+    S = P + s*Q
+    phi1 = E.isogeny(S, model='montgomery', algorithm="factored")
+    return phi1.codomain().j_invariant()
+\end{lstlisting}
+
+\subsubsection{SIDH的安全性以及攻击方案\cite{28}}
+理论上SIDH的安全性主要依赖于通过公钥中给出的曲线来求出它对应的同源是困难的，但是在2022年SIDH就被宣布完全破解，
+攻击代码在Github上开源：https://github.com/GiacomoPope/Castryck-Decru-SageMath。\par
+如果我们要使用上述开源项目对给定SIDH体系进行攻击，我们仅需要构造一个初始曲线（一般为方程$y^2=x^3+x$或$y^2=x^3+6x^2+x$所定义的超奇异椭圆曲线）上的自同态$[2i]$使得$[2i]\circ[2i]=[-4]$（实际上就是一个$[2i]$倍点映射），
+但是Sagemath并不能直接给$GF(p^2)$上的椭圆曲线的点乘上$2i$，所以我们需要自行针对特定曲线构造$[2i]$，在这里仅介绍$E_0:y^2=x^3+x$和$E_6:y^2=x^3+6x^2+x$这两条曲线上的$[2i]$映射。\par
+首先是曲线$E_0:y^2=x^3+x$，在文献\cite{28}中提到该曲线上的自同态映射$[2i]$为：
+\begin{equation}
+    [2i]:(x,y)\mapsto[2](-x,iy)
+    \nonumber
+\end{equation}
+我们可以通过下述Sagemath代码来实现这个自同态映射：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+def two_i(P):
+    E = P.curve()
+    if P == E(0):
+        return E(0)
+    else:
+        x, y = P.xy()
+        return 2*E(-x, i*y)
+\end{lstlisting}
+而对于$E_6:y^2=x^3+6x^2+x$，因为存在一个2-同源$\phi:E_6\to E_0$，根据文献\cite{28}，我们可以利用这个同源来构造$[2i]$映射。
+在此之前我们需要了解对偶同源的概念：
+\begin{concept}{对偶同源（Dual Isogeny）}
+    设$\phi:E\to E'$是一个$d$-同源（其中$d>0$），那么必然存在唯一同源$\hat{\phi}:E'\to E$满足：
+    \begin{equation}
+        \hat{\phi}\circ\phi=[d]_E,\quad\phi\circ\hat{\phi}=[d]_{E'}
+        \nonumber
+    \end{equation}
+    其中$[d]_E$和$[d]_{E'}$分别表示$E$和$E'$上的$d$倍点映射，那么$\hat{\phi}$称为$\phi$的对偶同源（dual isogeny）。
+\end{concept}
+那么对于上述2-同源$\phi:E_6\to E_0$，我们可以得到其对偶同源$\hat{\phi}:E_0\to E_6$，再结合$E_0$上的$[i]$映射：
+\begin{equation}
+    [i]_{E_0}:E_0\to E_0:(x,y)\mapsto(-x,iy)
+    \nonumber
+\end{equation}
+可以得到$E_6$上的$[2i]$映射：
+\begin{equation}
+    [2i]_{E_6} = \hat{\phi}\circ[i]_{E_0}\circ\phi
+    \nonumber
+\end{equation}
+可以验证：
+\begin{equation}
+    \begin{aligned}
+        [2i]_{E_6}\circ[2i]_{E_6} 
+        &= \hat{\phi}\circ[i]_{E_0}\circ\phi\circ\hat{\phi}\circ[i]_{E_0}\circ\phi\\
+        &= \hat{\phi}\circ[i]_{E_0}\circ[2]_{E_0}\circ[i]_{E_0}\circ\phi\\
+        &= \hat{\phi}\circ[-2]_{E_0}\circ\phi\\
+        &= [-2]_{E_6}\circ\hat{\phi}\circ\phi\\
+        &= [-2]_{E_6}\circ[2]_{E_6}\\
+        &= [-4]_{E_6}
+    \end{aligned}
+    \nonumber
+\end{equation}
+上述推导说明了$[2i]_{E_6}$的本质，实际上在开源代码中给出了如下$E_6$上的$[2i]$映射的Sagemath实现代码：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+def generate_distortion_map(E):
+    if E.a_invariants() != (0,6,0,1,0):
+        raise NotImplementedError
+    return E.isogeny(E.lift_x(ZZ(1)), codomain=E)
+\end{lstlisting}
+直接使用即可。在这里以CryptoCTF 2023的\href{https://www.nssctf.cn/problem/4387}{Shevid}一题为例，题目给出代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+#!/usr/bin/env sage  
+  
+from Crypto.Util.number import *  
+from Crypto.Cipher import AES  
+from hashlib import md5  
+from flag import flag  
+  
+def gen_param(B):  
+    while True:  
+       a = randint(B >> 1, B)  
+       b = randint(B >> 2, B >> 1)  
+       p = 2**a * 3**b - 1  
+       if is_prime(p):  
+          return a, b  
+  
+def gen_dmap(E):  
+    return E.isogeny(E.lift_x(ZZ(1)), codomain = E)  
+  
+def gen_tpt(E, a, b):  
+    P, Q = [((p + 1) // 2**a) * _ for _ in E.gens()]  
+    R, S = [((p + 1) // 3**b) * _ for _ in E.gens()]  
+    return P, Q, R, S  
+  
+def keygen(EC, b, P, Q, R, S):  
+    skey = randint(1, 3**b)  
+    T = R + skey * S  
+    phi = EC.isogeny(T, algorithm = "factored")  
+    _phi_dom, _phi_P, _phi_Q = phi.codomain(), phi(P), phi(Q)  
+    return skey, _phi_dom, _phi_P, _phi_Q  
+  
+a, b = gen_param(190)  
+p = 2**a * 3**b - 1  
+  
+F.<x> = GF(p^2, modulus = x**2 + 1)  
+EC = EllipticCurve(F, [0, 6, 0, 1, 0])  
+P, Q, R, S = gen_tpt(EC, a, b)  
+  
+print(f'P = {P.xy()}')  
+print(f'Q = {Q.xy()}')  
+print(f'R = {R.xy()}')  
+print(f'S = {S.xy()}')  
+  
+skey, _phi_dom, _phi_P, _phi_Q = keygen(EC, b, P, Q, R, S)  
+  
+print(f'_phi_dom = {_phi_dom}')  
+print(f'_phi_P   = {_phi_P.xy()}')  
+print(f'_phi_Q   = {_phi_Q.xy()}')  
+  
+key = md5(long_to_bytes(skey)).digest()  
+iv = md5(str(skey).encode()).digest()  
+  
+cipher = AES.new(key, AES.MODE_CFB, iv=iv)  
+enc = cipher.encrypt(flag)  
+  
+print(f'enc = {enc.hex()}')
+\end{lstlisting}
+这里给出了一个初始曲线为$E_6:y^2 = x^3 + 6x^2 + x$的SIDH的实例，并且给出了Alice的公开点$P,Q$和Bob的公钥$(\phi(E),\phi(P),\phi(Q))$，
+我们需要通过这些信息去还原Bob的私钥$k_B$，从而获得flag，那么我们就可以使用上述开源项目进行攻击，具体攻击代码如下：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# sage 10.4
+
+from sage.all import *
+from public_values_aux import *
+from Crypto.Util.number import *
+from Crypto.Cipher import AES
+from hashlib import md5
+
+load('castryck_decru_shortcut.sage')
+
+p = ...
+Fd.<i> = GF(p^2, modulus=[1, 0, 1])
+E = EllipticCurve(Fd, [0, 6, 0, 1, 0])
+E.set_order((p+1)^2)
+
+a = 142
+b = 69
+
+a2 = 6
+a4 = 2070374075904221348548347954672740119972290047985052548426161483408084160515*i+896749506444795652787374405713981306103783874504413776724865996633074195878
+a6 = 2497300913991521538985990865799426081199023429830552981773916386651958830387*i+4243320791854592301388975795466391442631117041175807728844738724691845270777
+
+_phi_dom = EllipticCurve(Fd, [0, a2, 0, a4, a6])
+
+_phi_P = _phi_dom(...)
+_phi_Q = _phi_dom(...)
+
+P2 = E(...)
+Q2 = E(...)
+P3 = E(...)
+Q3 = E(...)
+two_i = generate_distortion_map(E)
+check_torsion_points(E, a, b, P2, Q2, P3, Q3)
+
+enc = "..."
+
+recovered_key = CastryckDecruAttack(E, P2, Q2, _phi_dom, _phi_P, _phi_Q, two_i, num_cores=1)
+
+key = md5(long_to_bytes(int(recovered_key))).digest()
+iv = md5(str(recovered_key).encode()).digest()
+
+cipher = AES.new(key, AES.MODE_CFB, iv=iv)
+flag = cipher.decrypt(bytes.fromhex(enc))
+
+print(flag)
+\end{lstlisting}
+上述代码中的\texttt{P2,Q2,P3,Q3}分别对应题目代码中的\texttt{P,Q,R,S}（即Alice的公开点$P,Q$以及Bob的公开点$R,S$）
 
 
 
@@ -2918,6 +4279,14 @@ print(flag)
     \bibitem{19} Hlaváč, M., Rosa, T. Extended Hidden Number Problem and Its Cryptanalytic Applications[J]. Selected Areas in Cryptography(SAC 2006), 114-133, 2006 [DOI: 10.1007/978-3-540-74462-7\_9]
     \bibitem{20} Steven D. Galbraith, Shishay W. Gebregiyorgis, and Sean Murphy. Algorithms for the Approximate Common Divisor Problem[J]. Cryptology {ePrint} Archive, Paper 2016/215, 2016. [URL: https://eprint.iacr.org/2016/215]
     \bibitem{21} Wang, Y., Aono, Y., Takagi, T. An Experimental Study of Kannan’s Embedding Technique for the Search LWE Problem[J]. Information and Communications Security, pp. 541–553. 2018. [DOI: 10.1007/978-3-319-89500-0\_47]
+    \bibitem{22} Jeffrey Hoffstein, Jill Pipher, Joseph H. Silverman. An Introduction to Mathematical Cryptography[M]. New York: Springer, 2008. [DOI: 10.1007/978-1-4939-1711-2]
+    \bibitem{23} Jean-Sébastien Coron, Agnese Gini. A Polynomial-Time Algorithm for Solving the Hidden Subset Sum Problem[J]. Cryptology {ePrint} Archive, Paper 2020/461, 2020. [URL: https://eprint.iacr.org/2020/461]
+    \bibitem{24} Luca De Feo. Mathematics of Isogeny Based Cryptography[J]. CoRR, 2017. [DOI: 10.48550/arXiv.1711.04062]
+    \bibitem{25} Craig Costello. Supersingular isogeny key exchange for beginners[J]. Cryptology {ePrint} Archive, Paper 2019/1321, 2019. [URL: https://eprint.iacr.org/2019/1321]
+    \bibitem{26} Dale Husemöller. Elliptic Curves[M]. New York: Springer, 2004.
+    \bibitem{27} Daniel J. Bernstein, Luca De Feo, Antonin Leroux, Benjamin Smith. Faster computation of isogenies of large prime degree[J]. ANTS XIV, Open Book Series Vol. 4, No. 1, 2020. [DOI: 10.48550/arXiv.2003.10118]
+    \bibitem{28} Wouter Castryck, Thomas Decru. An efficient key recovery attack on SIDH[J]. Cryptology {ePrint} Archive, Paper 2022/975, 2022. [URL: https://eprint.iacr.org/2022/975]
+    \bibitem{29} József Vass. A Generalization of Euler's Criterion to Composite Moduli[J]. arXiv, 2015. [DOI: 10.48550/arXiv.1507.00098]
 \end{thebibliography}
 \end{document}
 

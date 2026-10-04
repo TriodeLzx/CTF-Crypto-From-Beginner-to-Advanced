@@ -32,22 +32,33 @@
 \contentsline {subsection}{\numberline {4.1.5}相关消息攻击\cite {11}}{32}{subsection.4.1.5}%
 \contentsline {subsubsection}{\numberline {4.1.5.1}多个明文之间存在隐式多项式关系的相关消息攻击}{35}{subsubsection.4.1.5.1}%
 \contentsline {subsection}{\numberline {4.1.6}$e$与$\varphi (n)$不互质}{37}{subsection.4.1.6}%
-\contentsline {section}{\numberline {4.2}椭圆曲线密码学}{38}{section.4.2}%
-\contentsline {section}{\numberline {4.3}数字签名算法}{39}{section.4.3}%
-\contentsline {section}{\numberline {4.4}格密码}{40}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}格基规约算法}{41}{subsection.4.4.1}%
-\contentsline {subsection}{\numberline {4.4.2}解决最近向量问题}{42}{subsection.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.3}背包问题（Knapsack Problem）}{44}{subsection.4.4.3}%
-\contentsline {subsubsection}{\numberline {4.4.3.1}低密度子集和问题\cite {17}}{44}{subsubsection.4.4.3.1}%
-\contentsline {subsubsection}{\numberline {4.4.3.2}低密度多重子集和问题\cite {16}}{45}{subsubsection.4.4.3.2}%
-\contentsline {subsubsection}{\numberline {4.4.3.3}低密度模子集和问题与低密度多重模子集和问题}{48}{subsubsection.4.4.3.3}%
-\contentsline {subsection}{\numberline {4.4.4}隐藏数问题（Hidden Number Problem，HNP）}{49}{subsection.4.4.4}%
-\contentsline {subsubsection}{\numberline {4.4.4.1}扩展隐藏数问题（Extended Hidden Number Problem，EHNP）\cite {19}}{51}{subsubsection.4.4.4.1}%
-\contentsline {subsubsection}{\numberline {4.4.4.2}椭圆曲线隐藏数问题（Elliptic Curve Hidden Number Problem，ECHNP）}{56}{subsubsection.4.4.4.2}%
-\contentsline {subsection}{\numberline {4.4.5}近似公约数问题（Approximate Common Divisor Problem, ACD Problem）\cite {20}}{58}{subsection.4.4.5}%
-\contentsline {subsubsection}{\numberline {4.4.5.1}同步丢番图逼近方法（Simultaneous Diophantine approximation approach，SDA）}{58}{subsubsection.4.4.5.1}%
-\contentsline {subsection}{\numberline {4.4.6}容错学习问题（Learning with Errors, LWE）}{59}{subsection.4.4.6}%
-\contentsline {subsubsection}{\numberline {4.4.6.1}环LWE（Ring-LWE，RLWE）}{61}{subsubsection.4.4.6.1}%
-\contentsline {subsection}{\numberline {4.4.7}NTRU}{64}{subsection.4.4.7}%
-\contentsline {chapter}{Appendices}{65}{section*.7}%
-\contentsline {chapter}{\numberline {A}附录}{65}{appendix.1.A}%
+\contentsline {section}{\numberline {4.2}椭圆曲线密码学}{40}{section.4.2}%
+\contentsline {section}{\numberline {4.3}数字签名算法}{41}{section.4.3}%
+\contentsline {section}{\numberline {4.4}格密码}{42}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}格基规约算法}{43}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}解决最近向量问题}{44}{subsection.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}背包问题（Knapsack Problem）}{46}{subsection.4.4.3}%
+\contentsline {subsubsection}{\numberline {4.4.3.1}低密度子集和问题\cite {17}}{46}{subsubsection.4.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.4.3.2}低密度多重子集和问题\cite {16}}{47}{subsubsection.4.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.4.3.3}低密度模子集和问题与低密度多重模子集和问题}{50}{subsubsection.4.4.3.3}%
+\contentsline {subsection}{\numberline {4.4.4}隐藏数问题（Hidden Number Problem，HNP）}{51}{subsection.4.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.4.1}扩展隐藏数问题（Extended Hidden Number Problem，EHNP）\cite {19}}{53}{subsubsection.4.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.4.2}椭圆曲线隐藏数问题（Elliptic Curve Hidden Number Problem，ECHNP）}{58}{subsubsection.4.4.4.2}%
+\contentsline {subsection}{\numberline {4.4.5}近似公约数问题（Approximate Common Divisor Problem, ACD Problem）\cite {20}}{60}{subsection.4.4.5}%
+\contentsline {subsubsection}{\numberline {4.4.5.1}同步丢番图逼近方法（Simultaneous Diophantine approximation approach，SDA）}{60}{subsubsection.4.4.5.1}%
+\contentsline {subsection}{\numberline {4.4.6}容错学习问题（Learning with Errors, LWE）}{61}{subsection.4.4.6}%
+\contentsline {subsubsection}{\numberline {4.4.6.1}环LWE（Ring-LWE，RLWE）}{63}{subsubsection.4.4.6.1}%
+\contentsline {subsubsection}{\numberline {4.4.6.2}决定LWE（Decision-LWE）}{66}{subsubsection.4.4.6.2}%
+\contentsline {subsection}{\numberline {4.4.7}NTRU}{67}{subsection.4.4.7}%
+\contentsline {subsubsection}{\numberline {4.4.7.1}NTRU的实现}{69}{subsubsection.4.4.7.1}%
+\contentsline {subsubsection}{\numberline {4.4.7.2}针对NTRU的格攻击}{72}{subsubsection.4.4.7.2}%
+\contentsline {subsection}{\numberline {4.4.8}隐子集和问题（Hidden Subset Sum Problem）\cite {23}}{77}{subsection.4.4.8}%
+\contentsline {section}{\numberline {4.5}同源密码学}{81}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}前置知识\cite {24, 25, 26}}{81}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}同源}{82}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}超奇异同源Diffie-Hellman密钥交换体系（SIDH）}{86}{subsection.4.5.3}%
+\contentsline {subsubsection}{\numberline {4.5.3.1}SIDH协议细节}{87}{subsubsection.4.5.3.1}%
+\contentsline {subsubsection}{\numberline {4.5.3.2}SIDH实例\cite {25}}{87}{subsubsection.4.5.3.2}%
+\contentsline {subsubsection}{\numberline {4.5.3.3}SIDH的安全性以及攻击方案\cite {28}}{91}{subsubsection.4.5.3.3}%
+\contentsline {chapter}{Appendices}{97}{section*.16}%
+\contentsline {chapter}{\numberline {A}附录}{97}{appendix.1.A}%
