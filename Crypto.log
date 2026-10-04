@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  4 OCT 2026 15:43
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.12.25)  4 OCT 2026 15:53
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1091,10 +1091,10 @@ Package rerunfilecheck Info: File `Crypto.out' has not changed.
 (rerunfilecheck)             Checksum: 707CDA0CE30294F919768866F62B5B6D;5561.
  ) 
 Here is how much of TeX's memory you used:
- 29561 strings out of 474773
- 636910 string characters out of 5758618
+ 29560 strings out of 474773
+ 636906 string characters out of 5758618
  2213842 words of memory out of 5000000
- 51193 multiletter control sequences out of 15000+600000
+ 51192 multiletter control sequences out of 15000+600000
  569521 words of font info for 126 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  93i,21n,97p,950b,1817s stack positions out of 10000i,1000n,20000p,200000b,200000s
