@@ -174,8 +174,8 @@
     import gmpy2
     a=123456789
     b=987654321
-    x,y,d=gmpy2.gcdext(a,b)
-    print(x,y,d)
+    d,x,y=gmpy2.gcdext(a, b)
+    print(d,x,y)
 \end{lstlisting}
 该函数接受两个参数$a,b$，并返回三个值$d,x,y$，其中$d$为$a$与$b$的最大公约数，$x,y$则是方程$ax+by=d$的其中一组整数解.\par
 在后面也会对拓展欧几里得算法的应用进行更加详细的介绍.\par
@@ -1604,12 +1604,163 @@ for mp, mq in product(mps, mqs):
 代入题目数据运行即可获得flag.\par
 若想自己实现在有限域下开根的算法，可以参考\cite{12}所提及的AMM算法，这是一个比较经典且效率较高的算法.
 
-
 \newpage
 \section{椭圆曲线密码学}
 
 \newpage
 \section{数字签名算法}
+\label{sec:dsa}
+数字签名用于验证消息的完整性以及消息是否由相应私钥的持有者签发。签名者使用私钥生成签名，验证者使用公钥检查签名；消息本身仍可以公开，因此数字签名并不提供消息的机密性。\par
+本节参考\cite{29,30}介绍DSA（Digital Signature Algorithm）的基本原理、签名与验签过程，以及临时密钥的使用要求，具体算法细节以\cite{31}为依据。DSA是一个基于有限域乘法群的数字签名算法，其安全性与相应子群上的离散对数问题及具体实现有关\footnote{FIPS 186-5已不再批准DSA用于生成新的数字签名，仅保留对历史签名的验证，参见\cite{33}。本节用于理解该算法及相关密码学问题。}.\par
+
+\subsection{DSA的基本原理}
+\subsubsection{参数与密钥生成}
+在DSA中，所有参与方需要使用相同的域参数$(p,q,g)$。其中$p$决定有限域，$q$决定所使用的乘法子群的阶，二者的作用并不相同：\par
+
+\begin{concept}{DSA的域参数与密钥}
+    设$p,q$均为奇质数，且$q\mid(p-1)$。选择$g\in\mathbb{Z}_p^{\times}$使得：
+    \begin{equation}
+        \operatorname{ord}_p(g)=q
+        \nonumber
+    \end{equation}
+    私钥为整数$x\in\{1,2,\ldots,q-1\}$，对应的公钥为：
+    \begin{equation}
+        y=g^x\bmod p
+        \nonumber
+    \end{equation}
+    域参数与$y$可以公开，私钥$x$需要保密。\par
+\end{concept}
+
+对于这样的$p,q$，可以取整数$a\in\{2,\ldots,p-2\}$，计算：
+\begin{equation}
+    g=a^{(p-1)/q}\bmod p
+    \nonumber
+\end{equation}
+若$g=1$，则重新选择$a$。根据费马小定理，有$g^q\equiv1\pmod p$；由于$q$是质数且$g\ne1$，$g$的阶只能为$q$，这样便得到了所需的生成元。这里的$g$生成的是一个$q$阶子群，而不一定是整个$\mathbb{Z}_p^{\times}$的生成元。\par
+
+通常用$L$和$N$分别表示$p$和$q$的二进制位数。参数的数值关系$q\mid(p-1)$、生成元的阶以及公钥所属的子群都需要满足要求，不能仅检查参数的位数。\par
+
+\subsubsection{消息摘要的处理}
+签名之前，需要使用双方约定的哈希函数$H$处理消息$m$。为了区分哈希输出的比特串与参与模运算的整数，以下用$h$表示处理后的摘要整数。\par
+设哈希输出长度为$\ell$位，$q$的位数为$N$，按照DSA的摘要处理规则，取哈希输出的前$\min(N,\ell)$位并转换为整数。若$H_{\mathrm{int}}(m)$表示将完整哈希输出按大端序转换得到的整数，则：
+\begin{equation}
+    h=\left\lfloor\frac{H_{\mathrm{int}}(m)}{2^{\max(\ell-N,0)}}\right\rfloor
+    \nonumber
+\end{equation}
+需要注意，取哈希输出的高位与将完整哈希整数直接对$q$取模是两种不同的处理方式。签名与验签必须使用同一种约定，分析具体示例时也应以其实际实现为准。\par
+
+\subsubsection{签名过程}
+给定消息$m$以及私钥$x$，签名者首先计算摘要整数$h$，然后选择一个保密的临时密钥$k\in\{1,2,\ldots,q-1\}$，计算：
+\begin{equation}
+    \begin{aligned}
+        r&=(g^k\bmod p)\bmod q,\\
+        s&=k^{-1}(h+xr)\bmod q.
+    \end{aligned}
+    \nonumber
+\end{equation}
+这里$k^{-1}$表示$k$在模$q$下的逆元。由于$q$是质数且$0<k<q$，该逆元存在。若$r=0$或$s=0$，则必须重新生成$k$并重新计算；最终得到的签名为$(r,s)$，满足$0<r,s<q$。\par
+签名结果可以与消息一起公开，但$x$和$k$都不应随签名输出。$x$通常跨多条消息使用，而$k$是参与单次签名计算的临时值。\par
+
+\subsubsection{验签过程}
+验证者获得消息$m$、签名$(r,s)$以及经确认的公钥$(p,q,g,y)$后，先检查$0<r<q$与$0<s<q$，任一条件不满足便拒绝该签名。通过范围检查后，按签名时的约定计算$h$，并计算：
+\begin{equation}
+    \begin{aligned}
+        w&=s^{-1}\bmod q,\\
+        u_1&=hw\bmod q,\\
+        u_2&=rw\bmod q,\\
+        v&=(g^{u_1}y^{u_2}\bmod p)\bmod q.
+    \end{aligned}
+    \nonumber
+\end{equation}
+若$v=r$，则接受签名，否则拒绝。域参数与公钥的有效性应在使用前检查；公钥与签名者身份之间的绑定也不能仅由一次验签建立。\par
+
+\begin{concept}{DSA验签正确性的证明}
+    对于使用同一消息、合法参数以及正确密钥生成的签名，有：
+    \begin{equation}
+        \begin{aligned}
+            u_1+xu_2&\equiv(h+xr)s^{-1}\pmod q\\
+                     &\equiv ks\cdot s^{-1}\equiv k\pmod q.
+        \end{aligned}
+        \nonumber
+    \end{equation}
+    因为$y\equiv g^x\pmod p$且$g$的阶为$q$，所以：
+    \begin{equation}
+        g^{u_1}y^{u_2}\equiv g^{u_1+xu_2}\equiv g^k\pmod p.
+        \nonumber
+    \end{equation}
+    先取模$p$的标准代表，再取模$q$，便有$v=(g^k\bmod p)\bmod q=r$。\par
+\end{concept}
+\par
+
+\subsection{DSA实例}
+\subsubsection{小参数的手算示例}
+为了展示每一步的含义，取$p=23,q=11,g=4$，则$q\mid(p-1)$且$g$的阶为11。选择私钥$x=3$，公钥为$y=4^3\bmod23=18$。假定某条消息按双方约定得到摘要整数$h=6$，本次签名取$k=7$，则有：
+\begin{equation}
+    \begin{aligned}
+        k^{-1}&=8\pmod{11},\\
+        r&=(4^7\bmod23)\bmod11=8,\\
+        s&=8(6+3\times8)\bmod11=9.
+    \end{aligned}
+    \nonumber
+\end{equation}
+因此签名为$(8,9)$。验证者计算：
+\begin{equation}
+    \begin{aligned}
+        w&=9^{-1}\bmod11=5,\\
+        u_1&=6\times5\bmod11=8,\\
+        u_2&=8\times5\bmod11=7,\\
+        v&=(4^8\times18^7\bmod23)\bmod11=8=r.
+    \end{aligned}
+    \nonumber
+\end{equation}
+\par
+
+\subsubsection{Python中的签名与验签}
+下面的示例使用同一组小参数，采用SHA-256并按$q$的位数截取摘要高位。临时密钥通过\texttt{secrets}模块生成，并处理$r=0$或$s=0$的情况：
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily,breaklines=true,keywordstyle=\bfseries\color{blue}]
+# Python 3.8 or later; small parameters for illustration
+from hashlib import sha256
+from secrets import randbelow
+
+p, q, g = 23, 11, 4
+x = 3
+y = pow(g, x, p)
+
+def hash_to_int(message):
+    digest = sha256(message).digest()
+    value = int.from_bytes(digest, "big")
+    shift = max(len(digest) * 8 - q.bit_length(), 0)
+    return value >> shift
+
+def sign(message, private_key):
+    if not 0 < private_key < q:
+        raise ValueError("private key out of range")
+    h = hash_to_int(message)
+    while True:
+        k = randbelow(q - 1) + 1
+        r = pow(g, k, p) % q
+        if r == 0:
+            continue
+        s = pow(k, -1, q) * (h + private_key * r) % q
+        if s != 0:
+            return r, s
+
+def verify(message, signature, public_key):
+    r, s = signature
+    if not (0 < r < q and 0 < s < q):
+        return False
+    if not (1 < public_key < p):
+        return False
+    if pow(public_key, q, p) != 1:
+        return False
+    h = hash_to_int(message)
+    w = pow(s, -1, q)
+    u1, u2 = h * w % q, r * w % q
+    v = pow(g, u1, p) * pow(public_key, u2, p) % p % q
+    return v == r
+
+\end{lstlisting}
+\par
 
 \newpage
 \section{格密码}
@@ -4286,6 +4437,11 @@ print(flag)
     \bibitem{26} Dale Husemöller. Elliptic Curves[M]. New York: Springer, 2004.
     \bibitem{27} Daniel J. Bernstein, Luca De Feo, Antonin Leroux, Benjamin Smith. Faster computation of isogenies of large prime degree[J]. ANTS XIV, Open Book Series Vol. 4, No. 1, 2020. [DOI: 10.48550/arXiv.2003.10118]
     \bibitem{28} Wouter Castryck, Thomas Decru. An efficient key recovery attack on SIDH[J]. Cryptology {ePrint} Archive, Paper 2022/975, 2022. [URL: https://eprint.iacr.org/2022/975]
+    \bibitem{29} DexterJie. DSA数字签名[EB/OL]. 2024. \href{https://dexterjie.github.io/2024/07/26/DSA/}{文章链接}.
+    \bibitem{30} mi1n9. DSA签名[EB/OL]. 2024. \href{https://mi1n9.github.io/2024/08/17/DSA\%E7\%AD\%BE\%E5\%90\%8D/}{文章链接}.
+    \bibitem{31} National Institute of Standards and Technology. Digital Signature Standard (DSS), FIPS PUB 186-4[S]. 2013. [DOI: \href{https://doi.org/10.6028/NIST.FIPS.186-4}{10.6028/NIST.FIPS.186-4}]
+    \bibitem{32} Thomas Pornin. Deterministic Usage of the Digital Signature Algorithm (DSA) and Elliptic Curve Digital Signature Algorithm (ECDSA), RFC 6979[S]. 2013. \href{https://www.rfc-editor.org/rfc/rfc6979}{RFC全文}.
+    \bibitem{33} National Institute of Standards and Technology. Digital Signature Standard (DSS), FIPS PUB 186-5[S]. 2023. [DOI: \href{https://doi.org/10.6028/NIST.FIPS.186-5}{10.6028/NIST.FIPS.186-5}]
 \end{thebibliography}
 \end{document}
 
